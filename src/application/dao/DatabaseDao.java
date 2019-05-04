@@ -5,7 +5,7 @@ import java.util.List;
 public interface DatabaseDao {
 	public <T> List<T> findAll(Class<T> resultType);
 	public <T> T findById(int id, Class<T> resultType);
-	public void save(Object entity);
+	public int save(Object entity);
 	public void delete(Object entity);
 	public <T> List<T> find(Object entity, Class<T> resultType, boolean onlyUniqueFields);
 	

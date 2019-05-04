@@ -1,6 +1,7 @@
 package application.controllers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.exception.ConstraintViolationException;
@@ -51,12 +52,15 @@ public class GenreController {
 	@ResponseBody
 	public String updateForm(@PathVariable("tableName") String tableName,
 			@RequestBody String request){
-		System.out.println("Otrzymano POST! parametry "+request);
-		String[] params=request.split("&");
+		System.out.println("Otrzymano POST! parametry: ["+request+"]");
+		String recordNumber=request.substring(0, request.indexOf("&"));
+		String[] params=request.substring(request.indexOf("&")+1).split("&");
+		System.out.println("Po split: "+Arrays.toString(params));
+		int idOfRecord=0;
 		try {
 			Class<?> queryClass=Class.forName("application.entities."+tableName);
 			Object newRecord=databaseDao.constructEntity(queryClass, params);
-			databaseDao.save(newRecord);
+			idOfRecord=databaseDao.save(newRecord);
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch(DataIntegrityViolationException dive) {
@@ -66,7 +70,7 @@ public class GenreController {
 			}
 			return "Error while updating: "+dive.getMessage();
 		}
-		return "Successful update on record id:"+params[0];
+		return "Successful update on record id:"+idOfRecord+",No:"+recordNumber;
 	}
 			
 	private List<String> getHeadersNames(Object record){

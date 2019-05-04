@@ -41,11 +41,12 @@ public class DatabaseDaoImpl implements DatabaseDao {
 	}
 
 	@Override
-	public void save(Object entity) {
+	public int save(Object entity) {
 		System.out.println("To update: "+entity);
 //		List<?> alreadyInDB=find(entity, entity.getClass(),true);
 //		if(!alreadyInDB.contains(entity))
 		sessionFactory.getCurrentSession().saveOrUpdate(entity);
+		return getRecordId(entity);
 	}
 
 	@Override
@@ -122,5 +123,22 @@ public class DatabaseDaoImpl implements DatabaseDao {
 		if (resultType.isAnnotationPresent(Table.class))
 			return resultType.getAnnotation(Table.class).name();
 		return "";
+	}
+	
+	/**
+	 * Ta metoda zwraca wartoœæ pola id danej encji.
+	 * @param entity - sprawdzana encja
+	 * @return wartoœæ kolumny id tego rekordu.
+	 */
+	private int getRecordId(Object entity) {
+		int result=0;
+		try {
+			Field idField=entity.getClass().getDeclaredField("id");
+			idField.setAccessible(true);
+			result=idField.getInt(entity);
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 }
