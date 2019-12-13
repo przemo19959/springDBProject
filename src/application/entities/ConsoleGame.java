@@ -47,86 +47,29 @@ public class ConsoleGame {
 	@OneToOne
 	@JoinColumn(name = "fk_kategoria_wiekowa")
 	private AgeCategory ageCategory;
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
 	
-	public Date getDateOfRelease() {
-		return dateOfRelease;
-	}
-
-	public void setDateOfRelease(Date dateOfRelease) {
-		this.dateOfRelease = dateOfRelease;
-	}
-
-	public Publisher getPublisher() {
-		return publisher;
-	}
-
-	public void setPublisher(Publisher publisher) {
-		this.publisher = publisher;
-	}
-	
-	public Producer getProducer() {
-		return producer;
-	}
-
-	public void setProducer(Producer producer) {
-		this.producer = producer;
-	}
-
-	public Language getLanguage() {
-		return language;
-	}
-
-	public void setLanguage(Language language) {
-		this.language = language;
-	}
-
-	public GameplayMode getGameplayMode() {
-		return gameplayMode;
-	}
-
-	public void setGameplayMode(GameplayMode gameplayMode) {
-		this.gameplayMode = gameplayMode;
-	}
-	
-	public HardwarePlatform getPlatform() {
-		return platform;
-	}
-
-	public void setPlatform(HardwarePlatform platform) {
-		this.platform = platform;
-	}
-
-	public Genre getGenre() {
-		return genre;
-	}
-
-	public void setGenre(Genre genre) {
-		this.genre = genre;
-	}
-
-	public AgeCategory getAgeCategory() {
-		return ageCategory;
-	}
-
-	public void setAgeCategory(AgeCategory ageCategory) {
-		this.ageCategory = ageCategory;
-	}
+	//@formatter:off
+	public int getId() {return id;}
+	public void setId(int id) {this.id = id;}
+	public String getTitle() {return title;}
+	public void setTitle(String title) {this.title = title;}
+	public Date getDateOfRelease() {return dateOfRelease;}
+	public void setDateOfRelease(Date dateOfRelease) {this.dateOfRelease = dateOfRelease;}
+	public Publisher getPublisher() {return publisher;}
+	public void setPublisher(Publisher publisher) {this.publisher = publisher;}
+	public Producer getProducer() {return producer;}
+	public void setProducer(Producer producer) {this.producer = producer;}
+	public Language getLanguage() {return language;}
+	public void setLanguage(Language language) {this.language = language;}
+	public GameplayMode getGameplayMode() {return gameplayMode;}
+	public void setGameplayMode(GameplayMode gameplayMode) {this.gameplayMode = gameplayMode;}
+	public HardwarePlatform getPlatform() {return platform;}
+	public void setPlatform(HardwarePlatform platform) {this.platform = platform;}
+	public Genre getGenre() {return genre;}
+	public void setGenre(Genre genre) {this.genre = genre;}
+	public AgeCategory getAgeCategory() {return ageCategory;}
+	public void setAgeCategory(AgeCategory ageCategory) {this.ageCategory = ageCategory;}
+	//@formatter:on
 
 	@Override
 	public String toString() {

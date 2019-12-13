@@ -64,6 +64,7 @@ public class DBServiceConfig {
 		hibernateProp.put("show_sql", false);
 		hibernateProp.put("formate_sql", false);
 		hibernateProp.put("use_sql_comments", false);
+		hibernateProp.put("hibernate.hbm2ddl.auto","update");	//dziêki temu automatycznie przy tworzeniu fabryki sesji, tworzone s¹ tabele
 		return hibernateProp;
 	}
 

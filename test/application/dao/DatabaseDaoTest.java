@@ -2,8 +2,6 @@ package application.dao;
 
 import static org.junit.Assert.assertNotNull;
 
-import java.util.List;
-
 import javax.transaction.Transactional;
 
 import org.hibernate.SessionFactory;

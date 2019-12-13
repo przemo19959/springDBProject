@@ -41,7 +41,8 @@ public class GenreController {
 		List<?> recordsInDB=databaseDao.findAll(queryClass);
 		
 		List<Record> records=new ArrayList<>();
-		records.add(new Record(getHeadersNames(recordsInDB.get(0))));
+		if(recordsInDB.size()>0)
+			records.add(new Record(getHeadersNames(recordsInDB.get(0))));
 		for(int i=0;i<recordsInDB.size();i++) {
 			records.add(new Record(getValues(recordsInDB.get(i),i+1)));
 		}

@@ -19,26 +19,14 @@ public class Language {
 	@Column(name="skrot")
 	private String shortcut;
 	
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public String getShortcut() {
-		return shortcut;
-	}
-	public void setShortcut(String shortcut) {
-		this.shortcut = shortcut;
-	}
+	//@formatter:off
+	public int getId() {return id;}
+	public void setId(int id) {this.id = id;}
+	public String getName() {return name;}
+	public void setName(String name) {this.name = name;}
+	public String getShortcut() {return shortcut;}
+	public void setShortcut(String shortcut) {this.shortcut = shortcut;}
+	//@formatter:on
 	
 	@Override
 	public String toString() {
