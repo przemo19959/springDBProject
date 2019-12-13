@@ -16,7 +16,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import application.configs.DBServiceConfig;
 import application.entities.Genre;
 
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes= {DBServiceConfig.class})
 @Transactional

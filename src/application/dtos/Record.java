@@ -1,4 +1,4 @@
-package application.xml;
+package application.dtos;
 
 import java.util.List;
 
