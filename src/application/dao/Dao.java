@@ -1,22 +1,22 @@
 package application.dao;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface DatabaseDao {
+public interface Dao<T> {
 	// CRUD operations
-
 	// C-Create
-	public int save(Object entity);
+	public int save(T entity);
 
 	// R-Retrieve
-	public <T> List<T> findAll(Class<T> resultType);
-	public <T> T findById(int id, Class<T> resultType);
+	public List<T> findAll();
+	public Optional<T> findById(int id);
 
 	// U-Update
-	public void update(Object entity);
+	public void update(T entity);
 
 	// D-Delete
-	public void delete(Object entity);
+	public void delete(T entity);
 
 //	public <T> List<T> find(Object entity, Class<T> resultType, boolean onlyUniqueFields);
 

@@ -1,13 +1,34 @@
 <!DOCTYPE html>
-<html ng-app="demo">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>Hello AngularJS</title>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
-<script src="hello.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular.js" charset="UTF-8"></script>
+<script type="text/javascript" src="/springDBProject/js/hello.js" charset="UTF-8"></script>
 </head>
-<body>
-	<div ng-controller="Hello">
+<body ng-app="demo" ng-controller="Hello">
+	<table>
+		<tr>
+			<td>
+				<select ng-model="tableCBox" ng-options="table.name for table in tables" ng-change="findAll()"></select>
+			</td>
+			<td>
+				<input type="text" placeholder="type id of record" ng-model="id">
+			</td>
+			<td>
+				<button ng-click="findById()">findById</button>
+			</td>
+		</tr>
+	</table>
+
+	<table>
+		<tr ng-repeat="record in records">
+			<td>{{record.id}}</td>
+			<td>{{record.name}}</td>
+		</tr>
+	</table>
+
+	<div>
 		<button ng-click=getGenre()>GetGenre</button>
 		<p>Genre Data:</p><br> 
 		<p>id: {{id}}</p>
