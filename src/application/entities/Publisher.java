@@ -7,8 +7,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import lombok.Data;
+
 @Entity
 @Table(name="wydawca")
+@Data
 public class Publisher {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -16,16 +19,4 @@ public class Publisher {
 	private int id;
 	@Column(name="nazwa",unique=true)
 	private String name;
-	
-	//@formatter:off
-	public int getId() {return id;}
-	public void setId(int id) {this.id = id;}
-	public String getName() {return name;}
-	public void setName(String nazwa) {this.name = nazwa;}
-	//@formatter:on
-	
-	@Override
-	public String toString() {
-		return "Publisher [id=" + id + ", name=" + name + "]";
-	}
 }

@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Hello AngularJS</title>
+<link rel="stylesheet" href="/springDBProject/css/list.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular.js" charset="UTF-8"></script>
 <script type="text/javascript" src="/springDBProject/js/hello.js" charset="UTF-8"></script>
 </head>
@@ -21,10 +22,10 @@
 		</tr>
 	</table>
 
-	<table>
+	<table id="mainTable">
+		<tr><th ng-repeat="header in columns">{{header}}</th></tr>
 		<tr ng-repeat="record in records">
-			<td>{{record.id}}</td>
-			<td>{{record.name}}</td>
+			<td ng-repeat="column in columns">{{toString(record[column])}}</td>
 		</tr>
 	</table>
 

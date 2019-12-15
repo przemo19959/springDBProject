@@ -7,8 +7,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import lombok.Data;
+
 @Entity
 @Table(name="platforma_sprzetowa")
+@Data
 public class HardwarePlatform {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -17,19 +20,5 @@ public class HardwarePlatform {
 	@Column(name="nazwa",unique=true)
 	private String name;
 	@Column(name="skrot")
-	private String shortcut;
-	
-	//@formatter:off
-	public int getId() {return id;}
-	public void setId(int id) {this.id = id;}
-	public String getName() {return name;}
-	public void setName(String name) {this.name = name;}
-	public String getShortcut() {return shortcut;}
-	public void setShortcut(String shortcut) {this.shortcut = shortcut;}
-	//@formatter:on
-	
-	@Override
-	public String toString() {
-		return "HardwarePlatform [id=" + id + ", name=" + name + ", shortcut=" + shortcut + "]";
-	}
+	private String shortcut;	
 }

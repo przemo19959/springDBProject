@@ -1,58 +1,26 @@
 @charset "UTF-8";
 
-.header{
-	color: white;
-	background-color: orange;
-}
-
 #mainTable {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  font-size: small;
   border-collapse: collapse;
+  width: 100%;
 }
 
-#mainTable, .header, .data,.hoverOff {
-  border: 1px solid black;
-  padding: 5px;
+#mainTable td, #mainTable th {
+  border: 1px solid #ddd;
+  padding: 8px;
 }
 
-.p{
-	font-family:consolas;
-	font-size: 16px;
-	font-weight: bold;
+#mainTable tr:nth-child(even){background-color: #f2f2f2;}
+
+#mainTable tr:hover {background-color: #ddd;}
+
+#mainTable th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #4CAF50;
+  color: white;
 }
-
-#loader {
-  border: 5px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 5px solid #3498db;
-  width: 30px;
-  height: 30px;
-  animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.data:hover {background-color:orange;}
-.hoverOff:hover {background-color:white;}
-
-.error{
-	border-bottom-color: red;
-	background: url(img/error-icon.png) no-repeat right;
-	background-size: 15px 15px;
-}
-
-.valid{
-	border-bottom-color: green;
-	background: url(img/ok-icon.png) no-repeat right;
-	background-size: 15px 15px;
-}
-
-.none{
-	border-bottom-color: white;
-	background: url(img/warning-icon.png) no-repeat right;
-	background-size: 17px 17px;
-}
-
-
