@@ -14,7 +14,7 @@
 				<select ng-model="tableCBox" ng-options="table.name for table in tables" ng-change="findAll()"></select>
 			</td>
 			<td>
-				<input type="text" placeholder="type id of record" ng-model="id">
+				<input class="{{idInputStyle}}" type="number" placeholder="type id of record" ng-model="id" ng-change="idFieldChanged()">
 			</td>
 			<td>
 				<button ng-click="findById()">findById</button>
@@ -29,11 +29,5 @@
 		</tr>
 	</table>
 
-	<div>
-		<button ng-click=getGenre()>GetGenre</button>
-		<p>Genre Data:</p><br> 
-		<p>id: {{id}}</p>
-		<p>name: {{name}}</p>
-	</div>
 </body>
 </html>
