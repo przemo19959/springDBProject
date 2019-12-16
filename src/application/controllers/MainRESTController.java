@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,5 +32,15 @@ public class MainRESTController {
 	@GetMapping(value = {"/{tableName}/{id}"})
 	public <T> ResponseEntity<T> findAll(@PathVariable String tableName, @PathVariable int id) {
 		return daoService.findById(tableName,id);
+	}
+	
+	@PutMapping(value= {"/{tableName}/{id}"}, consumes="application/json")
+	public void update(@PathVariable String tableName, @PathVariable int id, @RequestBody Object entity) {
+		daoService.update(tableName,entity);
+	}
+	
+	@PostMapping(value= {"/{tableName}"})
+	public <T> void save(@PathVariable String tableName, @RequestBody T entity) {
+		daoService.save(entity);
 	}
 }

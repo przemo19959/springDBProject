@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import application.dao.Dao;
 import lombok.SneakyThrows;
 
@@ -31,6 +33,15 @@ public class DaoService {
 		if(result.isPresent())
 			return ResponseEntity.ok(result.get());
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
+	
+	public void update(String tableName,Object entity) {
+		ObjectMapper mapper=new ObjectMapper();		
+		dao.update(mapper.convertValue(entity, getClassFromTableName(tableName))); //dodatkowe mapowanie, bo otrzymuje LinkedMapObject
+	}
+	
+	public <T> void save(T entity) {
+		dao.save(entity);
 	}
 	
 	@SneakyThrows(ClassNotFoundException.class)

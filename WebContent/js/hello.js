@@ -1,11 +1,12 @@
-var myApp = angular.module('demo', []);
-var mainURL = "http://localhost:8080/springDBProject/mainPage/";
+var myApp = angular.module('myApp', []); //utworzenie modułu o danej nazwie
+const mainURL = "http://localhost:8080/springDBProject/mainPage/";
+const ENTER_KEYCODE = 13;
 
-myApp.controller('Hello', ['$scope', '$http', function ($scope, $http) {
-	$scope.name = "nothing";
+myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http) {
+	$scope.records = []; //wszystkie aktualne rekordy głównej tablicy UI
+	$scope.columns = []; //wszystkie nazwy kolumn aktualnie wyświetlanej tabeli
 
-	$scope.records = [];
-	$scope.columns = [];
+	$scope.boolTab;
 
 	$scope.tables = [
 		{ name: "-- choose table --", value: "" },
@@ -20,8 +21,11 @@ myApp.controller('Hello', ['$scope', '$http', function ($scope, $http) {
 	];
 
 	$scope.tableCBox = $scope.tables[0];
-
 	$scope.idInputStyle = "error";
+
+	$scope.processContent = function (obj) {
+		return $scope.toString(obj);
+	}
 
 	$scope.toString = function (obj) {
 		var keys = Object.keys(obj);
@@ -39,10 +43,11 @@ myApp.controller('Hello', ['$scope', '$http', function ($scope, $http) {
 		if ($scope.tableCBox != $scope.tables[0]) {
 			$http.get(mainURL + $scope.tableCBox.value)
 				.then(function (response) {
-					console.log(response.data);
+					// console.log(response.data);
+					$scope.boolTab = new BooleanTable(response);
 					if (response.data.length > 0) {
-						$scope.records = response.data;
-						$scope.columns = Object.keys($scope.records[0]);
+						$scope.records = $scope.boolTab.records;
+						$scope.columns = $scope.boolTab.columns;
 					} else {
 						alert("Table " + $scope.tableCBox.name + " is empty!");
 					}
@@ -54,8 +59,8 @@ myApp.controller('Hello', ['$scope', '$http', function ($scope, $http) {
 		if ($scope.tableCBox != $scope.tables[0] && $scope.id > 0) {
 			$http.get(mainURL + $scope.tableCBox.value + "/" + $scope.id)
 				.then(function (response) {
-					if (response.status!=404) {
-						$scope.records=[];
+					if (response.status != 404) {
+						$scope.records = [];
 						$scope.records[0] = response.data;
 						$scope.columns = Object.keys($scope.records[0]);
 					} else {
@@ -72,4 +77,29 @@ myApp.controller('Hello', ['$scope', '$http', function ($scope, $http) {
 	$scope.idFieldChanged = function () {
 		$scope.idInputStyle = ($scope.id > 0) ? "correct" : "error";
 	}
+
+	$scope.addRecordClickHandler = function () {
+		// if($scope.tableCBox!=$scope.tables[0]){
+		// 	$scope.records.push();
+		// }else{
+		// 	alert("No table was chosen!");
+		// }
+	}
+
+	$scope.updateValue = function ($event, input,column) {
+		if ($event.keyCode == ENTER_KEYCODE) {
+			var previousValue=$scope.boolTab.getUpdatedRecord()[column];
+			if (input.updateInputValue.length > 0) {
+				$scope.boolTab.setRecordValue(input.updateInputValue);
+			}
+			var updatedRecord=$scope.boolTab.getUpdatedRecord();
+			$http.put(mainURL + $scope.tableCBox.value + "/" + updatedRecord["id"], updatedRecord).then(function (response) {
+				$scope.boolTab.removeUpdatingElement();
+				if(response.status!=200){
+					$scope.boolTab.setRecordValue(previousValue);				
+				}
+			});
+		}
+	}
+
 }]);
