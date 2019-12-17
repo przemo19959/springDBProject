@@ -1,12 +1,12 @@
 var myApp = angular.module('myApp', []); //utworzenie modułu o danej nazwie
+
+//stałe
 const mainURL = "http://localhost:8080/springDBProject/mainPage/";
 const ENTER_KEYCODE = 13;
+const ESC_KEYCODE = 27;
 
 myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http) {
-	$scope.records = []; //wszystkie aktualne rekordy głównej tablicy UI
-	$scope.columns = []; //wszystkie nazwy kolumn aktualnie wyświetlanej tabeli
-
-	$scope.boolTab;
+	$scope.virtualTab;
 
 	$scope.tables = [
 		{ name: "-- choose table --", value: "" },
@@ -31,9 +31,7 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 		var keys = Object.keys(obj);
 		if (keys.length > 0 && typeof obj != 'string') {
 			var result = [], i;
-			for (i = 1; i < keys.length; i++) {
-				result.push(obj[keys[i]]);
-			}
+			forRange(keys.length, i => { result.push(obj[keys[i]]); });
 			return result.join(", ");
 		}
 		return obj;
@@ -44,10 +42,8 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 			$http.get(mainURL + $scope.tableCBox.value)
 				.then(function (response) {
 					// console.log(response.data);
-					$scope.boolTab = new BooleanTable(response);
 					if (response.data.length > 0) {
-						$scope.records = $scope.boolTab.records;
-						$scope.columns = $scope.boolTab.columns;
+						$scope.virtualTab = new VirtualTable(response, false);
 					} else {
 						alert("Table " + $scope.tableCBox.name + " is empty!");
 					}
@@ -60,9 +56,7 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 			$http.get(mainURL + $scope.tableCBox.value + "/" + $scope.id)
 				.then(function (response) {
 					if (response.status != 404) {
-						$scope.records = [];
-						$scope.records[0] = response.data;
-						$scope.columns = Object.keys($scope.records[0]);
+						$scope.virtualTab = new VirtualTable(response, true);
 					} else {
 						alert("Table " + $scope.tableCBox.name + " doesn't contain record with id=" + $scope.id + "!");
 					}
@@ -86,20 +80,24 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 		// }
 	}
 
-	$scope.updateValue = function ($event, input,column) {
+	$scope.updateValueHandler = function ($event, input) {
 		if ($event.keyCode == ENTER_KEYCODE) {
-			var previousValue=$scope.boolTab.getUpdatedRecord()[column];
+			const previousValue = $scope.virtualTab.getUpdatedColumnName();
 			if (input.updateInputValue.length > 0) {
-				$scope.boolTab.setRecordValue(input.updateInputValue);
+				$scope.virtualTab.setUpdatedFieldValue(input.updateInputValue);
 			}
-			var updatedRecord=$scope.boolTab.getUpdatedRecord();
-			$http.put(mainURL + $scope.tableCBox.value + "/" + updatedRecord["id"], updatedRecord).then(function (response) {
-				$scope.boolTab.removeUpdatingElement();
-				if(response.status!=200){
-					$scope.boolTab.setRecordValue(previousValue);				
-				}
-			});
+			const updatedRecord = $scope.virtualTab.getUpdatedRecord();
+			$http.put(mainURL + $scope.tableCBox.value + "/" + updatedRecord["id"], updatedRecord)
+				.then(function (response) {
+					$scope.virtualTab.removeUpdatingUIElement();
+					if (response.status != 200) {
+						//przywróc starą wartość	
+						$scope.virtualTab.setUpdatedFieldValue(previousValue);
+					}
+				});
+		} else if ($event.keyCode == ESC_KEYCODE) {
+			//usuń aktualizujący element HTML
+			$scope.virtualTab.removeUpdatingUIElement();
 		}
 	}
-
 }]);
