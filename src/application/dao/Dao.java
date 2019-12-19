@@ -8,49 +8,52 @@ import java.util.Optional;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.SneakyThrows;
 
 @Repository
-@Transactional
 public class Dao {
-	public static final String FIND_ALL = "SELECT * FROM {0};";
-	public static final String FIND_BY_ID = "SELECT * FROM {0} WHERE id= {1};";
+	// queries
+	private static final String FIND_ALL = "SELECT * FROM {0};";
+	private static final String FIND_BY_ID = "SELECT * FROM {0} WHERE id= {1};";
 
 	@Autowired
-	private SessionFactory sessionFactory;
-
+	private TransactionWrapper transactionWrapper;
+	
 	// CRUD operations
 	// C-Create
 	public <T> int save(T entity) {
-		sessionFactory.getCurrentSession().save(entity);
-		return getPrimaryKeyValue(entity);
+		return transactionWrapper.getTransactionResult(session -> {
+			session.save(entity);
+			return getPrimaryKeyValue(entity);
+		}, Integer.class);
 	}
 
 	// R-Retrieve
+	@SuppressWarnings("unchecked")
 	public <T> List<T> findAll(Class<T> resultType) {
-		return sessionFactory.getCurrentSession()
-				.createNativeQuery(MessageFormat.format(FIND_ALL, getTableName(resultType)), resultType).list();
+		return transactionWrapper.getTransactionResult(
+				session -> session
+						.createNativeQuery(MessageFormat.format(FIND_ALL, getTableName(resultType)), resultType).list(),
+				List.class);
 	}
 
+	@SuppressWarnings("unchecked")
 	public <T> Optional<T> findById(int id, Class<T> resultType) {
-		return sessionFactory.getCurrentSession()
-				.createNativeQuery(MessageFormat.format(FIND_BY_ID, getTableName(resultType), id), resultType)
-				.uniqueResultOptional();
+		return transactionWrapper.getTransactionResult(session->session.createNativeQuery(MessageFormat.format(FIND_BY_ID, getTableName(resultType), id), resultType)
+				.uniqueResultOptional(), Optional.class);
 	}
 
 	// U-Update
 	public <T> void update(T entity) {
-		sessionFactory.getCurrentSession().update(entity);
+		transactionWrapper.performTransaction(session->session.update(entity));
 	}
 
 	// D-Delete
 	public <T> void delete(T entity) {
-		sessionFactory.getCurrentSession().delete(entity);
+		transactionWrapper.performTransaction(session->session.delete(entity));
 	}
 
 	// Other methods
@@ -63,8 +66,10 @@ public class Dao {
 	@SneakyThrows(value = IllegalAccessException.class)
 	private <T> int getPrimaryKeyValue(T entity) {
 		for (Field field : entity.getClass().getDeclaredFields()) {
-			if (field.isAnnotationPresent(Id.class))
+			if (field.isAnnotationPresent(Id.class)) {
+				field.setAccessible(true);
 				return field.getInt(entity);
+			}
 		}
 		return 0;
 	}
