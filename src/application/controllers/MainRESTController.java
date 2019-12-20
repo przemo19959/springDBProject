@@ -2,6 +2,7 @@ package application.controllers;
 
 import java.util.List;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import application.services.exceptions.WrongTableNameException;
 @RestController
 @RequestMapping(value = "/mainPage")
 public class MainRESTController {
+	public static final String CONSTRAINT_VIOLITION_MESSAGE="Entity from request body violates unique constraints!";
 	private DaoService daoService;
 
 	@Autowired
@@ -60,5 +62,10 @@ public class MainRESTController {
 	@ExceptionHandler(TableNameRequestBodyException.class)
 	public ResponseEntity<String> tableNameRequestBody(TableNameRequestBodyException e) {
 		return new ResponseEntity<String>(e.getResponseMessage(), HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<String> constraintViolated() {
+		return new ResponseEntity<String>(CONSTRAINT_VIOLITION_MESSAGE, HttpStatus.FORBIDDEN);
 	}
 }

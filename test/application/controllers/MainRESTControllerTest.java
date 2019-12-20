@@ -219,5 +219,26 @@ public class MainRESTControllerTest {
 								OptimisticLockException.class.getSimpleName(), "AgeCategory", expectedResponse)))//
 				.andReturn();
 	}
+	
+	@Test
+	@Order(11)
+	@DisplayName("update - when unique constraint is broken, exception is thrown")
+	public void test11() throws Exception {
+		Genre genre = new Genre();
+		genre.setId(2);
+		genre.setName("nowa fajna nazwa");
+
+		ObjectMapper mapper = new ObjectMapper();
+		String requestJson = mapper.writeValueAsString(genre);
+		
+		mockMvc.perform(put("/mainPage/Genre/" + genre.getId()).contentType(MediaType.APPLICATION_JSON_UTF8)
+				.content(requestJson))//
+//				.andDo(print())//
+				.andExpect(status().isForbidden())//
+				.andExpect(
+						content().string(MainRESTController.CONSTRAINT_VIOLITION_MESSAGE))//
+				.andReturn();
+	}
+	
 
 }
