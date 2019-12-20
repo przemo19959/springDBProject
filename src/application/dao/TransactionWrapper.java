@@ -42,6 +42,7 @@ public class TransactionWrapper {
 			tx.commit();
 		} catch (Exception e) {
 			rollBackTransactionIfPossible(tx);
+			throw e;
 		} finally {
 			session.close();
 		}

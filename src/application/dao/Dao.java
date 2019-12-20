@@ -55,7 +55,7 @@ public class Dao {
 	public <T> void delete(T entity) {
 		transactionWrapper.performTransaction(session->session.delete(entity));
 	}
-
+	
 	// Other methods
 	private <T> String getTableName(Class<T> type) {
 		if (type.isAnnotationPresent(Table.class))
