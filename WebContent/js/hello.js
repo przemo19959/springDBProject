@@ -65,10 +65,15 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 				.then(function (response) {
 					if (response.status != 404) {
 						$scope.virtualTab = new VirtualTable(response, true);
-					} else {
-						alert("Table " + $scope.tableCBox.name + " doesn't contain record with id=" + $scope.id + "!");
+						forRange($scope.virtualTab.foreignColumns.length, i => {
+							$http.get(mainURL + $scope.virtualTab.foreignColumns[i])
+								.then(function (response) {
+									$scope.virtualTab.addForeignRecordsForColumn(response, i);
+								});
+						});
 					}
-					//todo - aktualizacja żeby działała i tutaj
+				}).catch(function(error){
+					printErrorFromServer(error);
 				});
 		} else if ($scope.tableCBox == $scope.tables[0]) {
 			alert("Table was't chosen!");
