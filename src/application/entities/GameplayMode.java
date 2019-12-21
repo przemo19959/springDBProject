@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name="tryb_gry")
+@Table(name="tryby_gry")
 @Data
 public class GameplayMode {
 	@Id

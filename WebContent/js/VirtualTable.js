@@ -1,5 +1,5 @@
 /**
- * Thi class represents virtual table.
+ * This class represents virtual table.
  */
 class VirtualTable {
 	constructor(response, findById) {
@@ -11,6 +11,14 @@ class VirtualTable {
 		}
 
 		this.columns = Object.keys(this.records[0]); //nazwy kolumn rekordów
+		this.foreignColumns = [];
+		this.foreignRecordsForEachForeignColumn = [];
+		forRange(this.columns.length, i => {
+			var keys = Object.keys(this.records[0][this.columns[i]]);
+			if (keys.length > 0 && typeof this.records[0][this.columns[i]] != 'string') {
+				this.foreignColumns.push(this.columns[i][0].toUpperCase() + this.columns[i].slice(1));
+			}
+		});
 		this.rowCount = this.records.length;
 		this.columnCount = this.columns.length;
 
@@ -18,7 +26,29 @@ class VirtualTable {
 		this.currentRowIndex = -1;
 		this.currentColumnIndex = -1;
 
-		this.table = makeTwoDimArray(this.rowCount, this.columnCount,false);
+		this.table = makeTwoDimArray(this.rowCount, this.columnCount, false);
+	}
+
+	getForeignColumnRecords(column) {
+		var records=this.foreignRecordsForEachForeignColumn[this.getIndexOfForeignColumnIfExists(column)];
+		return records;
+	}
+
+	getIndexOfForeignColumnIfExists(column) {
+		var result = -1;
+		if (column != undefined) {
+			var firstUpperCaseLetterColumn = column.charAt(0).toUpperCase() + column.slice(1);
+			forRange(this.foreignColumns.length, i => {
+				if (firstUpperCaseLetterColumn == this.foreignColumns[i]) {
+					result = i;
+				}
+			});
+		}
+		return result;
+	}
+
+	addForeignRecordsForColumn(response, arrayIndex) {
+		this.foreignRecordsForEachForeignColumn[arrayIndex]=(response.data);
 	}
 
 	getUpdatedRecord() {
@@ -30,6 +60,7 @@ class VirtualTable {
 	}
 
 	setUpdatedFieldValue(value) {
+		// console.log(value);
 		this.records[this.currentRowIndex][this.columns[this.currentColumnIndex]] = value;
 	}
 
@@ -48,18 +79,18 @@ class VirtualTable {
 	}
 
 	getTableValue(record, column) {
-		var rowIndex=-1;
-		for(var i=0;i<this.rowCount;i++){
-			if(this.records[i]==record){
-				rowIndex=i;
+		var rowIndex = -1;
+		for (var i = 0; i < this.rowCount; i++) {
+			if (this.records[i] == record) {
+				rowIndex = i;
 				break;
 			}
 		}
 
-		var columnIndex=-1;
-		for(var i=0;i<this.columnCount;i++){
-			if(this.columns[i]==column){
-				columnIndex=i;
+		var columnIndex = -1;
+		for (var i = 0; i < this.columnCount; i++) {
+			if (this.columns[i] == column) {
+				columnIndex = i;
 				break;
 			}
 		}
@@ -67,13 +98,21 @@ class VirtualTable {
 		return this.table[rowIndex][columnIndex];
 	}
 
+	isEditedNormalColumn(record, column) {
+		return (this.getTableValue(record, column) && this.getIndexOfForeignColumnIfExists(column) == -1) ? true : false;
+	}
+
+	isEditedForeignColumn(record, column) {
+		return (this.getTableValue(record, column) && this.getIndexOfForeignColumnIfExists(column) != -1) ? true : false;
+	}
+
 	isOneAlreadyUpdated() {
-		forRange(this.rowCount, i => {
-			forRange(this.columnCount, j => {
+		for(var i=0;i<this.rowCount;i++){
+			for(var j=0;j<this.columnCount;j++){
 				if (this.table[i][j])
 					return true;
-			});
-		});
+			}
+		}
 		return false;
 	}
 

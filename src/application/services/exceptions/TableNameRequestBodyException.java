@@ -1,24 +1,24 @@
 package application.services.exceptions;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
-import javax.persistence.OptimisticLockException;
-
+import application.controllers.ErrorHandler;
 import application.services.MyException;
+import lombok.Getter;
 
+@Getter
 public class TableNameRequestBodyException extends MyException {
-	public static final String TABLE_REQUESTBODY_MISMATCH = "{0}: Table {1} doesn''t match request body {2}!";
-	private final String tableName;
-	private final String requestBody;
+	public static final String ERROR_MESSAGE = "{0}: Table {1} doesn''t match request body {2}!";
+	public static final String[] SOLUTIONS = {"Check if request body fields matches tableName from request path!"};
+	
+	private final ErrorHandler errorHandler;
 
 	public TableNameRequestBodyException(Exception originalException, String tableName, String requestBody) {
 		super(originalException);
-		this.tableName = tableName;
-		this.requestBody = requestBody;
-	}
-
-	public String getResponseMessage() {
-		return MessageFormat.format(TABLE_REQUESTBODY_MISMATCH, //
-				OptimisticLockException.class.getSimpleName(), tableName, requestBody);
+		String solutions=Arrays.stream(SOLUTIONS).collect(Collectors.joining(", "));
+		errorHandler=new ErrorHandler(MessageFormat.format(ERROR_MESSAGE, super.getOriginalException()//
+				.getClass().getSimpleName(),tableName,requestBody),solutions);
 	}
 }

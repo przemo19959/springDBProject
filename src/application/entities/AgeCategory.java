@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name="kategoria_wiekowa")
+@Table(name="kategorie_wiekowe")
 @Data
 public class AgeCategory {
 	@Id

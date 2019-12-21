@@ -30,8 +30,9 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 	$scope.toString = function (obj) {
 		var keys = Object.keys(obj);
 		if (keys.length > 0 && typeof obj != 'string') {
-			var result = [], i;
-			forRange(keys.length, i => { result.push(obj[keys[i]]); });
+			var result = [];
+			//i>0 pomiń kolumnę z id
+			forRange(keys.length, i => { if (i > 0 && keys[i] != "$$hashKey") result.push(obj[keys[i]]); });
 			return result.join(", ");
 		}
 		return obj;
@@ -44,9 +45,16 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 					// console.log(response.data);
 					if (response.data.length > 0) {
 						$scope.virtualTab = new VirtualTable(response, false);
+						forRange($scope.virtualTab.foreignColumns.length, i => {
+							$http.get(mainURL + $scope.virtualTab.foreignColumns[i])
+								.then(function (response) {
+									$scope.virtualTab.addForeignRecordsForColumn(response, i);
+								});
+						});
 					} else {
 						alert("Table " + $scope.tableCBox.name + " is empty!");
 					}
+					// console.log($scope.virtualTab.foreignRecordsForEachForeignColumn);
 				});
 		}
 	}
@@ -60,6 +68,7 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 					} else {
 						alert("Table " + $scope.tableCBox.name + " doesn't contain record with id=" + $scope.id + "!");
 					}
+					//todo - aktualizacja żeby działała i tutaj
 				});
 		} else if ($scope.tableCBox == $scope.tables[0]) {
 			alert("Table was't chosen!");
@@ -83,7 +92,7 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 	$scope.updateValueHandler = function ($event, input) {
 		if ($event.keyCode == ENTER_KEYCODE) {
 			const previousValue = $scope.virtualTab.getUpdatedColumnName();
-			if (input.updateInputValue.length > 0) {
+			if (input.updateInputValue.length > 0 || Object.keys(input.updateInputValue).length > 0) {
 				$scope.virtualTab.setUpdatedFieldValue(input.updateInputValue);
 			}
 			const updatedRecord = $scope.virtualTab.getUpdatedRecord();
@@ -91,9 +100,11 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 				.then(function (response) {
 					$scope.virtualTab.removeUpdatingUIElement();
 					if (response.status != 200) {
-						//przywróc starą wartość	
+						//przywróc starą wartość
 						$scope.virtualTab.setUpdatedFieldValue(previousValue);
 					}
+				}).catch(function (error) {
+					printErrorFromServer(error);
 				});
 		} else if ($event.keyCode == ESC_KEYCODE) {
 			//usuń aktualizujący element HTML
@@ -101,3 +112,8 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 		}
 	}
 }]);
+
+
+const printErrorFromServer = function (error) {
+	alert(error.data.errorMessage + "\n\t" + error.data.solutions);
+}

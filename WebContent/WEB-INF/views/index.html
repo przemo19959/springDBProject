@@ -36,9 +36,14 @@
 		</tr>
 		<tr ng-repeat="record in virtualTab.records">
 			<td ng-repeat="column in virtualTab.columns" ng-dblclick="virtualTab.setTableValue(record,column,true)">
-				<p ng-if="virtualTab.getTableValue(record,column)==false">{{processContent(record[column])}}</p>
-				<input type="text" ng-if="virtualTab.getTableValue(record,column)" ng-keydown="updateValueHandler($event,this)"
+				<p ng-if="virtualTab.getTableValue(record,column)==false">
+					{{processContent(record[column])}}
+				</p>
+				<input type="text" ng-if="virtualTab.isEditedNormalColumn(record,column)" ng-keydown="updateValueHandler($event,this)"
 					ng-model="updateInputValue">
+				<select ng-model="updateInputValue" ng-if="virtualTab.isEditedForeignColumn(record,column)"
+				ng-options="processContent(foreignRecord) for foreignRecord in virtualTab.getForeignColumnRecords(column)" 
+				ng-keydown="updateValueHandler($event,this)"></select>	
 			</td>
 		</tr>
 	</table>

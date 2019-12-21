@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "gatunek")
+@Table(name = "gatunki")
 @Data
 public class Genre {
 	@Id

@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name="platforma_sprzetowa")
+@Table(name="platformy_sprzetowe")
 @Data
 public class HardwarePlatform {
 	@Id

@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name="producent")
+@Table(name="producenci")
 @Data
 public class Producer {
 	@Id

@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name="jezyk")
+@Table(name="jezyki")
 @Data
 public class Language {
 	@Id

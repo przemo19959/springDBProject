@@ -2,7 +2,6 @@ package application.controllers;
 
 import java.util.List;
 
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import application.services.DaoService;
+import application.services.exceptions.ConstraintException;
+import application.services.exceptions.NoSuchRecord;
 import application.services.exceptions.TableNameRequestBodyException;
 import application.services.exceptions.WrongTableNameException;
 
 @RestController
 @RequestMapping(value = "/mainPage")
 public class MainRESTController {
-	public static final String CONSTRAINT_VIOLITION_MESSAGE="Entity from request body violates unique constraints!";
 	private DaoService daoService;
 
 	@Autowired
@@ -38,7 +38,7 @@ public class MainRESTController {
 	}
 
 	@GetMapping(value = { "/{tableName}/{id}" })
-	public <T> ResponseEntity<T> findbyId(@PathVariable String tableName, @PathVariable int id) {
+	public <T> T findbyId(@PathVariable String tableName, @PathVariable int id) {
 		return daoService.findById(tableName, id);
 	}
 
@@ -55,17 +55,22 @@ public class MainRESTController {
 	// Exception Handlers
 
 	@ExceptionHandler(WrongTableNameException.class)
-	public ResponseEntity<String> wrongTableName(WrongTableNameException e) {
-		return new ResponseEntity<String>(e.getResponseMessage(), HttpStatus.BAD_REQUEST);
+	public ResponseEntity<ErrorHandler> wrongTableName(WrongTableNameException e) {
+		return new ResponseEntity<>(e.getErrorHandler(), HttpStatus.BAD_REQUEST);
 	}
-	
+
 	@ExceptionHandler(TableNameRequestBodyException.class)
-	public ResponseEntity<String> tableNameRequestBody(TableNameRequestBodyException e) {
-		return new ResponseEntity<String>(e.getResponseMessage(), HttpStatus.BAD_REQUEST);
+	public ResponseEntity<ErrorHandler> tableNameRequestBody(TableNameRequestBodyException e) {
+		return new ResponseEntity<>(e.getErrorHandler(), HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(ConstraintException.class)
+	public ResponseEntity<ErrorHandler> constraintViolated(ConstraintException e) {
+		return new ResponseEntity<>(e.getErrorHandler(), HttpStatus.FORBIDDEN);
 	}
 	
-	@ExceptionHandler(ConstraintViolationException.class)
-	public ResponseEntity<String> constraintViolated() {
-		return new ResponseEntity<String>(CONSTRAINT_VIOLITION_MESSAGE, HttpStatus.FORBIDDEN);
+	@ExceptionHandler(NoSuchRecord.class)
+	public ResponseEntity<ErrorHandler> noRecordWithGivenId(NoSuchRecord e) {
+		return new ResponseEntity<>(e.getErrorHandler(), HttpStatus.NOT_FOUND);
 	}
 }

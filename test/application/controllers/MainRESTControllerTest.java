@@ -7,10 +7,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import javax.persistence.OptimisticLockException;
 import javax.servlet.ServletContext;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -37,6 +41,8 @@ import application.configs.root.TestConfig;
 import application.configs.web.WebConfig;
 import application.dao.Dao;
 import application.entities.Genre;
+import application.services.exceptions.ConstraintException;
+import application.services.exceptions.NoSuchRecord;
 import application.services.exceptions.TableNameRequestBodyException;
 import application.services.exceptions.WrongTableNameException;
 
@@ -110,8 +116,12 @@ public class MainRESTControllerTest {
 		mockMvc.perform(get("/mainPage/casdasd"))
 //				.andDo(print())//
 				.andExpect(status().isBadRequest())//
-				.andExpect(content().string(MessageFormat.format(WrongTableNameException.WRONG_TABLENAME,//
-						ClassNotFoundException.class.getSimpleName(), "casdasd")))//
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(
+						jsonPath("$.errorMessage").value(MessageFormat.format(WrongTableNameException.ERROR_MESSAGE, //
+								ClassNotFoundException.class.getSimpleName(), "casdasd")))//
+				.andExpect(jsonPath("$.solutions").value(Arrays.stream(WrongTableNameException.SOLUTIONS)//
+						.collect(Collectors.joining(", "))))
 				.andReturn();
 	}
 
@@ -135,7 +145,12 @@ public class MainRESTControllerTest {
 		mockMvc.perform(get("/mainPage/Genre/13"))
 //				.andDo(print())//
 				.andExpect(status().isNotFound())//
-				.andExpect(content().string(""))//
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(
+						jsonPath("$.errorMessage").value(MessageFormat.format(NoSuchRecord.ERROR_MESSAGE, //
+								NoSuchElementException.class.getSimpleName(), "Genre",13)))//
+				.andExpect(jsonPath("$.solutions").value(Arrays.stream(NoSuchRecord.SOLUTIONS)//
+						.collect(Collectors.joining(", "))))
 				.andReturn();
 	}
 
@@ -143,11 +158,15 @@ public class MainRESTControllerTest {
 	@Order(7)
 	@DisplayName("findById - proper response is returned when request tableName is wrong")
 	public void test7() throws Exception {
-		mockMvc.perform(get("/mainPage/casdasd/1"))
+		mockMvc.perform(get("/mainPage/casdasd/1"))//
 //				.andDo(print())//
 				.andExpect(status().isBadRequest())//
-				.andExpect(content().string(MessageFormat.format(WrongTableNameException.WRONG_TABLENAME,//
-						ClassNotFoundException.class.getSimpleName(), "casdasd")))//
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(
+						jsonPath("$.errorMessage").value(MessageFormat.format(WrongTableNameException.ERROR_MESSAGE, //
+								ClassNotFoundException.class.getSimpleName(), "casdasd")))//
+				.andExpect(jsonPath("$.solutions").value(Arrays.stream(WrongTableNameException.SOLUTIONS)//
+						.collect(Collectors.joining(", "))))
 				.andReturn();
 	}
 
@@ -192,8 +211,12 @@ public class MainRESTControllerTest {
 				.content(requestJson))//
 //				.andDo(print())//
 				.andExpect(status().isBadRequest())//
-				.andExpect(content().string(MessageFormat.format(WrongTableNameException.WRONG_TABLENAME, //
-						ClassNotFoundException.class.getSimpleName(), "asdads")))//
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(
+						jsonPath("$.errorMessage").value(MessageFormat.format(WrongTableNameException.ERROR_MESSAGE, //
+								ClassNotFoundException.class.getSimpleName(), "asdads")))//
+				.andExpect(jsonPath("$.solutions").value(Arrays.stream(WrongTableNameException.SOLUTIONS)//
+						.collect(Collectors.joining(", "))))
 				.andReturn();
 	}
 
@@ -207,19 +230,22 @@ public class MainRESTControllerTest {
 
 		ObjectMapper mapper = new ObjectMapper();
 		String requestJson = mapper.writeValueAsString(genre);
-		
-		String expectedResponse=requestJson.replaceAll("\"", "").replaceAll(":", "=").replaceAll(",", ", ");
+
+		String expectedResponse = requestJson.replaceAll("\"", "").replaceAll(":", "=").replaceAll(",", ", ");
 
 		mockMvc.perform(put("/mainPage/AgeCategory/" + genre.getId()).contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(requestJson))//
 //				.andDo(print())//
 				.andExpect(status().isBadRequest())//
-				.andExpect(
-						content().string(MessageFormat.format(TableNameRequestBodyException.TABLE_REQUESTBODY_MISMATCH, //
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(jsonPath("$.errorMessage")
+						.value(MessageFormat.format(TableNameRequestBodyException.ERROR_MESSAGE, //
 								OptimisticLockException.class.getSimpleName(), "AgeCategory", expectedResponse)))//
+				.andExpect(jsonPath("$.solutions").value(Arrays.stream(TableNameRequestBodyException.SOLUTIONS)//
+						.collect(Collectors.joining(", "))))
 				.andReturn();
 	}
-	
+
 	@Test
 	@Order(11)
 	@DisplayName("update - when unique constraint is broken, exception is thrown")
@@ -230,15 +256,18 @@ public class MainRESTControllerTest {
 
 		ObjectMapper mapper = new ObjectMapper();
 		String requestJson = mapper.writeValueAsString(genre);
-		
+
 		mockMvc.perform(put("/mainPage/Genre/" + genre.getId()).contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(requestJson))//
 //				.andDo(print())//
 				.andExpect(status().isForbidden())//
-				.andExpect(
-						content().string(MainRESTController.CONSTRAINT_VIOLITION_MESSAGE))//
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))//
+				.andExpect(jsonPath("$.errorMessage")
+						.value(MessageFormat.format(ConstraintException.ERROR_MESSAGE, //
+								ConstraintViolationException.class.getSimpleName(), "Genre")))//
+				.andExpect(jsonPath("$.solutions").value(Arrays.stream(ConstraintException.SOLUTIONS)
+						.collect(Collectors.joining(", "))))//
 				.andReturn();
 	}
-	
 
 }
