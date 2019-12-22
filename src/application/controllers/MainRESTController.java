@@ -48,8 +48,8 @@ public class MainRESTController {
 	}
 
 	@PostMapping(value = { "/{tableName}" })
-	public <T> void save(@PathVariable String tableName, @RequestBody T entity) {
-		daoService.save(entity);
+	public void save(@PathVariable String tableName, @RequestBody Object body) {
+		daoService.save(tableName,body);
 	}
 
 	// Exception Handlers

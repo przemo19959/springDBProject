@@ -55,8 +55,20 @@ public class DaoService {
 		}
 	}
 
-	public <T> void save(T entity) {
-		dao.save(entity);
+	public void save(String tableName,Object body) {
+		System.out.println(body);
+		//TODO 22 gru 2019:napisaæ testy sprawdzaj¹ce t¹ metodê
+		Class<?> entityClass = getClassFromTableName(tableName);
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			dao.save(mapper.convertValue(body, entityClass)); // dodatkowe mapowanie, bo otrzymuje LinkedListMap
+		} catch (Exception e) {
+			if (e.getCause() instanceof ConstraintViolationException)
+				throw new ConstraintException(e, tableName);
+			else if (e instanceof OptimisticLockException)
+				throw new TableNameRequestBodyException(e, tableName, body.toString());
+			e.printStackTrace();
+		}
 	}
 
 	// helper methods

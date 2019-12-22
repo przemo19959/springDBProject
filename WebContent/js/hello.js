@@ -5,7 +5,7 @@ const mainURL = "http://localhost:8080/springDBProject/mainPage/";
 const ENTER_KEYCODE = 13;
 const ESC_KEYCODE = 27;
 
-myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http) {
+myApp.controller('myAppController', ['$scope', '$http', '$filter', function ($scope, $http, $filter) {
 	$scope.virtualTab;
 
 	$scope.tables = [
@@ -40,9 +40,10 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 
 	$scope.findAll = function () {
 		if ($scope.tableCBox != $scope.tables[0]) {
+			$scope.recordSB = [];
 			$http.get(mainURL + $scope.tableCBox.value)
 				.then(function (response) {
-					// console.log(response.data);
+					console.log(response.data);
 					if (response.data.length > 0) {
 						$scope.virtualTab = new VirtualTable(response, false);
 						forRange($scope.virtualTab.foreignColumns.length, i => {
@@ -72,7 +73,7 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 								});
 						});
 					}
-				}).catch(function(error){
+				}).catch(function (error) {
 					printErrorFromServer(error);
 				});
 		} else if ($scope.tableCBox == $scope.tables[0]) {
@@ -87,19 +88,28 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 	}
 
 	$scope.addRecordClickHandler = function () {
-		// if($scope.tableCBox!=$scope.tables[0]){
-		// 	$scope.records.push();
-		// }else{
-		// 	alert("No table was chosen!");
-		// }
+		if ($scope.tableCBox != $scope.tables[0] && $scope.virtualTab.wasNewRecordAdded == false) {
+			forRange($scope.virtualTab.columnCount, i => {
+				$scope.recordSBStyle[i] = "error";
+			});
+			$scope.virtualTab.addNotSetRecord();
+		} else {
+			alert("No table was chosen or one new record was already added!");
+		}
 	}
 
-	$scope.updateValueHandler = function ($event, input) {
-		if ($event.keyCode == ENTER_KEYCODE) {
-			const previousValue = $scope.virtualTab.getUpdatedColumnName();
-			if (input.updateInputValue.length > 0 || Object.keys(input.updateInputValue).length > 0) {
-				$scope.virtualTab.setUpdatedFieldValue(input.updateInputValue);
-			}
+	$scope.updateInputValue = { value: "" };
+	$scope.updateValueHandler = function () {
+
+		const previousValue = $scope.virtualTab.getUpdatedColumnName();
+		var updatingUIContent = $scope.updateInputValue.value;
+		if ($scope.virtualTab.getUpdatedColumnName() == "dateOfRelease") //na siłę wpisana kolumna
+			updatingUIContent = $filter('date')(updatingUIContent, "yyyy-MM-dd");
+
+		if (updatingUIContent.length > 0 ||
+			Object.keys(updatingUIContent).length > 0) {
+			$scope.virtualTab.setUpdatedFieldValue(updatingUIContent);
+
 			const updatedRecord = $scope.virtualTab.getUpdatedRecord();
 			$http.put(mainURL + $scope.tableCBox.value + "/" + updatedRecord["id"], updatedRecord)
 				.then(function (response) {
@@ -111,10 +121,50 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 				}).catch(function (error) {
 					printErrorFromServer(error);
 				});
-		} else if ($event.keyCode == ESC_KEYCODE) {
-			//usuń aktualizujący element HTML
-			$scope.virtualTab.removeUpdatingUIElement();
+		} else {
+			alert("Updated field is empty or no item was chosen from combo box!");
 		}
+	}
+
+	$scope.undoAction = function () {
+		$scope.virtualTab.removeUpdatingUIElement();
+		$scope.updateInputValue.value = "";
+	}
+
+
+	$scope.recordSB = [];
+	$scope.recordSBStyle = [];
+	$scope.inputChanged = function ($index, column) {
+		$scope.recordSBStyle[$index] = ($scope.virtualTab.doesInputCorrect(column, $scope.recordSB[$index])) ? "correct" : "error";
+	}
+
+	$scope.saveRecordHandler = function () {
+		if ($scope.recordSB.length != $scope.virtualTab.columnCount){
+			alert("Not all fields where set!");
+			return;
+		}
+		for (var i = 0; i < $scope.recordSBStyle.length; i++) {
+			if ($scope.recordSBStyle[i] == "error") {
+				alert("At least one field has invalid value!");
+				return;
+			}
+		}
+
+		var recordToSave={};
+		forRange($scope.recordSB.length,i=>{
+			recordToSave[$scope.virtualTab.columns[i]]=$scope.recordSB[i];
+		});
+
+		$http.post(mainURL+$scope.tableCBox.value,recordToSave)
+			.then(function(response){
+				console.log(response);
+				if(response.status==200){
+					$scope.findAll();
+				}
+		}).catch(function(error){
+			printErrorFromServer(error);
+		})
+
 	}
 }]);
 

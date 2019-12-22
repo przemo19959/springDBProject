@@ -27,10 +27,56 @@ class VirtualTable {
 		this.currentColumnIndex = -1;
 
 		this.table = makeTwoDimArray(this.rowCount, this.columnCount, false);
+
+		this.wasNewRecordAdded = false;
+		this.newRecord = {};
+	}
+
+	//na siłę wpisane pod konkretną bazę danych
+	getInputType(column) {
+		switch (column) {
+			case "id": return "number";
+			case "dateOfRelease": return "date";
+			default: return "text"; //domyślnie tekst
+		}
+	}
+
+	doesInputCorrect(column, value){
+		const datePattern=/\d{4}-\d{2}-\d{2}/;
+		switch(column){
+			case "id": return value>0;
+			case "dateOfRelease": return value.match(datePattern)!=null;
+			default: return value.length>0;
+		}
+	}
+
+	getDefaultValuesBasedOnColumnType(column) {
+		switch (column) {
+			case "id": return "_setNumber_";
+			case "dateOfRelease": return "_setDate_";
+			default: return "_setText_"; //domyślnie tekst
+		}
+	}
+
+	addNotSetRecord() {
+		if (this.wasNewRecordAdded)
+			alert("One Record was already added! Fill values and save record to DB!");
+		this.wasNewRecordAdded = true;
+		forRange(this.columnCount, i => {
+			this.newRecord[this.columns[i]] = this.getDefaultValuesBasedOnColumnType(this.columns[i]);
+		});
+	}
+
+	recordsEquals(recordA, recordB) {
+		for (var i = 0; i < this.columnCount; i++) {
+			if (recordA[this.columns[i]] != recordB[this.columns[i]])
+				return false;
+		}
+		return true;
 	}
 
 	getForeignColumnRecords(column) {
-		var records=this.foreignRecordsForEachForeignColumn[this.getIndexOfForeignColumnIfExists(column)];
+		var records = this.foreignRecordsForEachForeignColumn[this.getIndexOfForeignColumnIfExists(column)];
 		return records;
 	}
 
@@ -48,7 +94,7 @@ class VirtualTable {
 	}
 
 	addForeignRecordsForColumn(response, arrayIndex) {
-		this.foreignRecordsForEachForeignColumn[arrayIndex]=(response.data);
+		this.foreignRecordsForEachForeignColumn[arrayIndex] = (response.data);
 	}
 
 	getUpdatedRecord() {
@@ -60,27 +106,30 @@ class VirtualTable {
 	}
 
 	setUpdatedFieldValue(value) {
-		// console.log(value);
 		this.records[this.currentRowIndex][this.columns[this.currentColumnIndex]] = value;
 	}
 
 	removeUpdatingUIElement() {
-		this.table[this.currentRowIndex][this.currentColumnIndex] = false;
+		if (this.currentRowIndex != -1 && this.currentColumnIndex != -1)
+			this.table[this.currentRowIndex][this.currentColumnIndex] = false;
 	}
 
 	setTableValue(record, column, value) {
 		if (this.isOneAlreadyUpdated()) {
-			alert("One is already updated! Update one first, then next one.");
+			if (record != this.records[this.currentRowIndex] || column != this.columns[this.currentColumnIndex])
+				alert("One is already updated! Update one first, then next one.");
 			return;
 		}
-		forRange(this.rowCount, i => { if (this.records[i] == record) this.currentRowIndex = i; });
+		forRange(this.rowCount, i => { if (this.recordsEquals(this.records[i], record)) this.currentRowIndex = i; });
 		forRange(this.columnCount, i => { if (this.columns[i] == column) this.currentColumnIndex = i; });
-		this.table[this.currentRowIndex][this.currentColumnIndex] = value;
+		if (this.currentColumnIndex != -1 && this.currentRowIndex != -1);
+			this.table[this.currentRowIndex][this.currentColumnIndex] = value;
 	}
 
 	getTableValue(record, column) {
 		var rowIndex = -1;
 		for (var i = 0; i < this.rowCount; i++) {
+			// if (this.recordsEquals(this.records[i], record)) {
 			if (this.records[i] == record) {
 				rowIndex = i;
 				break;
@@ -94,21 +143,22 @@ class VirtualTable {
 				break;
 			}
 		}
-
+		if (rowIndex == -1 || columnIndex == -1)
+			return false;
 		return this.table[rowIndex][columnIndex];
 	}
 
 	isEditedNormalColumn(record, column) {
-		return (this.getTableValue(record, column) && this.getIndexOfForeignColumnIfExists(column) == -1) ? true : false;
+		return (this.getTableValue(record, column) && this.getIndexOfForeignColumnIfExists(column) == -1);
 	}
 
-	isEditedForeignColumn(record, column) {
-		return (this.getTableValue(record, column) && this.getIndexOfForeignColumnIfExists(column) != -1) ? true : false;
+	idEditedForeignColumn(record, column) {
+		return (this.getTableValue(record, column) && this.getIndexOfForeignColumnIfExists(column) != -1);
 	}
 
 	isOneAlreadyUpdated() {
-		for(var i=0;i<this.rowCount;i++){
-			for(var j=0;j<this.columnCount;j++){
+		for (var i = 0; i < this.rowCount; i++) {
+			for (var j = 0; j < this.columnCount; j++) {
 				if (this.table[i][j])
 					return true;
 			}
@@ -117,11 +167,7 @@ class VirtualTable {
 	}
 
 	printTable() {
-		forRange(this.rowCount, i => {
-			forRange(this.columnCount, j => {
-				console.log(this.table[i][j]);
-			});
-		});
+		console.log(this.table);
 	}
 }
 
