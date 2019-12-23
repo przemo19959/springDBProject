@@ -5,9 +5,15 @@ const mainURL = "http://localhost:8080/springDBProject/mainPage/";
 const ENTER_KEYCODE = 13;
 const ESC_KEYCODE = 27;
 
-myApp.controller('myAppController', ['$scope', '$http', '$filter', function ($scope, $http, $filter) {
-	$scope.virtualTab;
+const HTTP_OK_CODE = 200;
+const HTTP_CREATED_CODE = 201;
+const HTTP_NOT_FOUND = 404;
 
+const GET = "GET";
+const PUT = "PUT";
+const POST = "POST";
+
+myApp.controller('myAppController', ['$scope', '$http', '$filter', function ($scope, $http, $filter) {
 	$scope.tables = [
 		{ name: "-- choose table --", value: "" },
 		{ name: "kategorie wiekowe", value: "AgeCategory" },
@@ -19,9 +25,7 @@ myApp.controller('myAppController', ['$scope', '$http', '$filter', function ($sc
 		{ name: "producenci", value: "Producer" },
 		{ name: "wydawcy", value: "Publisher" }
 	];
-
 	$scope.tableCBox = $scope.tables[0];
-	$scope.idInputStyle = "error";
 
 	$scope.processContent = function (obj) {
 		return $scope.toString(obj);
@@ -38,43 +42,52 @@ myApp.controller('myAppController', ['$scope', '$http', '$filter', function ($sc
 		return obj;
 	}
 
+	//R-Receive-findAll,findById
+	$scope.virtualTab;
 	$scope.findAll = function () {
 		if ($scope.tableCBox != $scope.tables[0]) {
-			// $scope.recordSB = ["*"]; //dla kolumny id
 			$scope.recordSB = { id: "*" };
-			$http.get(mainURL + $scope.tableCBox.value)
-				.then(function (response) {
-					console.log(response.data);
+			httpRequestTemplate($http, GET, mainURL + $scope.tableCBox.value, "",
+				function (response) {
+					// console.log(response.data);
 					if (response.data.length > 0) {
 						$scope.virtualTab = new VirtualTable(response, false);
 						forRange($scope.virtualTab.foreignColumns.length, i => {
-							$http.get(mainURL + $scope.virtualTab.foreignColumns[i])
-								.then(function (response) {
+							httpRequestTemplate($http, GET, mainURL + $scope.virtualTab.foreignColumns[i]
+								, "", function (response) {
 									$scope.virtualTab.addForeignRecordsForColumn(response, i);
+								}, function (error) {
+									printErrorFromServer(error);
 								});
 						});
 					} else {
 						alert("Table " + $scope.tableCBox.name + " is empty!");
 					}
-					// console.log($scope.virtualTab.foreignRecordsForEachForeignColumn);
+				}, function (error) {
+					printErrorFromServer(error);
 				});
 		}
 	}
 
+	$scope.idInputStyle = "error";
+	$scope.idFieldChanged = function () { $scope.idInputStyle = ($scope.id > 0) ? "correct" : "error"; }
 	$scope.findById = function () {
-		if ($scope.tableCBox != $scope.tables[0] && $scope.id > 0) {
-			$http.get(mainURL + $scope.tableCBox.value + "/" + $scope.id)
-				.then(function (response) {
-					if (response.status != 404) {
+		if ($scope.tableCBox != $scope.tables[0] && $scope.idInputStyle == "correct") {
+			httpRequestTemplate($http, GET, mainURL + $scope.tableCBox.value + "/" + $scope.id, "",
+				function (response) {
+					// console.log(response.data);
+					if (response.status != HTTP_NOT_FOUND) {
 						$scope.virtualTab = new VirtualTable(response, true);
 						forRange($scope.virtualTab.foreignColumns.length, i => {
-							$http.get(mainURL + $scope.virtualTab.foreignColumns[i])
-								.then(function (response) {
+							httpRequestTemplate($http, GET, mainURL + $scope.virtualTab.foreignColumns[i]
+								, "", function (response) {
 									$scope.virtualTab.addForeignRecordsForColumn(response, i);
+								}, function (error) {
+									printErrorFromServer(error);
 								});
 						});
 					}
-				}).catch(function (error) {
+				}, function (error) {
 					printErrorFromServer(error);
 				});
 		} else if ($scope.tableCBox == $scope.tables[0]) {
@@ -84,34 +97,32 @@ myApp.controller('myAppController', ['$scope', '$http', '$filter', function ($sc
 		}
 	}
 
-	$scope.idFieldChanged = function () {
-		$scope.idInputStyle = ($scope.id > 0) ? "correct" : "error";
-	}
 
+	//U-Update-update
 	$scope.updateInputValue = { value: "" };
-	$scope.updateValueHandler = function () {
+	$scope.update = function () {
+		const previousValue = $scope.virtualTab.getUpdatedCellValue();
+		const newValue = getFormatedDateIfDateObject($scope.updateInputValue.value);
 
-		const previousValue = $scope.virtualTab.getUpdatedColumnName();
-		var updatingUIContent = $scope.updateInputValue.value;
-		if ($scope.virtualTab.getUpdatedColumnName() == "dateOfRelease") //na siłę wpisana kolumna
-			updatingUIContent = $filter('date')(updatingUIContent, "yyyy-MM-dd");
-
-		if (updatingUIContent.length > 0 ||
-			Object.keys(updatingUIContent).length > 0) {
-			$scope.virtualTab.setUpdatedFieldValue(updatingUIContent);
-
+		//todo-tutaj poprawić, bo nie można aktualizować kolumn z kluczem głównym
+		if (newValue.length > 0 || Object.keys(newValue).length > 0) {
+			$scope.virtualTab.setUpdatedCellValue(newValue);
 			const updatedRecord = $scope.virtualTab.getUpdatedRecord();
-			$http.put(mainURL + $scope.tableCBox.value + "/" + updatedRecord["id"], updatedRecord)
-				.then(function (response) {
+			httpRequestTemplate($http, PUT,
+				mainURL + $scope.tableCBox.value + "/" + updatedRecord["id"], updatedRecord
+				, function (response) {
+					// console.log(response);
 					$scope.updateInputValue.value = "";
 					$scope.virtualTab.removeUpdatingUIElement();
-					if (response.status == 200) {
+					if (response.status == HTTP_OK_CODE) {
 						printResponseFromServer(response);
-					} else {//przywróc starą wartość
-						$scope.virtualTab.setUpdatedFieldValue(previousValue);
+					} else {
+						$scope.virtualTab.setUpdatedCellValue(previousValue);
 					}
-				}).catch(function (error) {
+				}, function (error) {
+					// console.log(error);
 					$scope.updateInputValue.value = "";
+					$scope.virtualTab.setUpdatedCellValue(previousValue);
 					printErrorFromServer(error);
 				});
 		} else {
@@ -119,85 +130,103 @@ myApp.controller('myAppController', ['$scope', '$http', '$filter', function ($sc
 		}
 	}
 
-	$scope.undoAction = function () {
+	$scope.undoUpdate = function () {
 		$scope.virtualTab.removeUpdatingUIElement();
 		$scope.updateInputValue.value = "";
 	}
 
-	$scope.addRecordClickHandler = function () {
-		if ($scope.tableCBox != $scope.tables[0] && $scope.virtualTab.wasNewRecordAdded == false) {
+	//C-Create-save
+	//inicjowane wartościami dla kolumny id o wymuszonej zawartości *
+	$scope.recordSB = { id: "*" };
+	$scope.recordSBStyle = ["correct"];
+
+	$scope.addRecordHandler = function () {
+		if ($scope.virtualTab != undefined && $scope.virtualTab.isNewRecordAdded()) {
+			alert("One record was already added! Fill values and save record to DB!");
+			return;
+		}
+		if ($scope.tableCBox != $scope.tables[0]) {
 			forRange($scope.virtualTab.columnCount, i => {
 				if (i > 0) {	//pomijamy kolumnę id => wymuszono correct
 					if ($scope.virtualTab.columns[i] == "dateOfRelease") {
-						$scope.recordSB["dateOfRelease"] = new Date(); //początkowa inicjalizacja aktualną datą
+						//początkowa inicjalizacja aktualną datą
+						$scope.recordSB["dateOfRelease"] = new Date();
 						$scope.recordSBStyle[i] = "correct";
 					} else
 						$scope.recordSBStyle[i] = "error";
 				}
 			});
-			console.log($scope.recordSB);
-			$scope.virtualTab.addNotSetRecord();
+			$scope.virtualTab.setNewRecordAdded(true);
 		} else {
-			alert("No table was chosen or one new record was already added!");
+			alert("No table was chosen!");
 		}
 	}
 
-	//inicjowane wartościami dla kolumny id o wymuszonej zawartości *
-	// $scope.recordSB = ["*"];
-	$scope.recordSB = { id: "*" };
-	$scope.recordSBStyle = ["correct"];
 	$scope.inputChanged = function ($index, column, isForeign) {
-		// console.log($scope.recordSB);
-		// if (column == "dateOfRelease") //na sztywno wpisane
-		// 	$scope.recordSB[$index] = $filter('date')($scope.recordSB[$index], "yyyy-MM-dd");
 		$scope.recordSBStyle[$index] =
 			($scope.virtualTab.doesInputCorrect(column,
-				//  $scope.recordSB[$index]
 				getFormatedDateIfDateObject($scope.recordSB[column])
 				, isForeign)) ? "correct" : "error";
 	}
 
-	$scope.saveRecordHandler = function () {
-		// if ($scope.recordSB.length != $scope.virtualTab.columnCount) {
+	$scope.save = function () {
 		if (Object.keys($scope.recordSB).length != $scope.virtualTab.columnCount) {
 			alert("Not all fields where set!");
 			return;
 		}
-		for (var i = 0; i < $scope.recordSBStyle.length; i++) {
-			if ($scope.recordSBStyle[i] == "error") {
-				alert("At least one field has invalid value!");
-				return;
-			}
+		if (isErrorStyleInArray($scope.recordSBStyle)) {
+			alert("At least one field has invalid value!");
+			return;
 		}
 
-		console.log($scope.recordSB);
-		var recordToSave = {};
-		forRange($scope.virtualTab.columnCount, i => {
-			recordToSave[$scope.virtualTab.columns[i]] = getFormatedDateIfDateObject($scope.recordSB[$scope.virtualTab.columns[i]]);
-		});
-		console.log(recordToSave);
-		$http.post(mainURL + $scope.tableCBox.value, recordToSave)
-		// $http.post(mainURL + $scope.tableCBox.value, $scope.recordSB)
-			.then(function (response) {
-				console.log(response);
-				if (response.status == 201) {
-					$scope.findAll();
-					printResponseFromServer(response);
-				}
-			}).catch(function (error) {
-				console.log(error);
-				printErrorFromServer(error);
-			})
+		// console.log($scope.recordSB);
+		var recordToSave = getFormattedCopyOf($scope.recordSB, $scope.virtualTab.columns);
+		// console.log(recordToSave);
 
+		httpRequestTemplate($http, POST, mainURL + $scope.tableCBox.value, recordToSave
+			, function (response) {
+				// console.log(response);
+				if (response.status == HTTP_CREATED_CODE) {
+					printResponseFromServer(response);
+					$scope.findAll();
+				}
+			}, function (error) {
+				// console.log(error);
+				printErrorFromServer(error);
+			});
 	}
 
-	$scope.undoSaveAction = function () {
-		$scope.virtualTab.wasNewRecordAdded = false;
-		// $scope.recordSB = ["*"];
+	$scope.undoSave = function () {
+		$scope.virtualTab.setNewRecordAdded(false);
 		$scope.recordSB = { id: "*" };
 		$scope.recordSBStyle = ["correct"];
 	}
 }]);
+
+const httpRequestTemplate = function ($http, methodType, requestURL, requestBody, successCallback, errorCallback) {
+	$http({
+		method: methodType,
+		url: requestURL,
+		data: requestBody
+	}).then(successCallback, errorCallback);
+}
+
+const isErrorStyleInArray = function (stylesArray) {
+	var result = false;
+	for (var i = 0; i < stylesArray.length; i++) {
+		if (stylesArray[i] == "error")
+			return true;
+	}
+	return result;
+}
+
+const getFormattedCopyOf = function (item, itemColumns) {
+	var recordToSave = {};
+	forRange(itemColumns.length, i => {
+		recordToSave[itemColumns[i]] = getFormatedDateIfDateObject(item[itemColumns[i]]);
+	});
+	return recordToSave;
+}
 
 //zwróc datę w formacie yyyy-mm-dd z obiektu Date
 const getFormatedDateIfDateObject = function (value) {
@@ -212,7 +241,4 @@ const getFormatedDateIfDateObject = function (value) {
 const printErrorFromServer = function (error) {
 	alert(error.data.errorMessage + "\n\t" + error.data.solutions);
 }
-
-const printResponseFromServer = function (response) {
-	alert(response.data.message);
-}
+const printResponseFromServer = function (response) { alert(response.data.message); }

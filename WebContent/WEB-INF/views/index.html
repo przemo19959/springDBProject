@@ -24,7 +24,7 @@
                 <button ng-click="findById()">findById</button>
             </td>
             <td>
-                <button ng-click="addRecordClickHandler()">addRecord</button>
+                <button ng-click="addRecordHandler()">addRecord</button>
             </td>
         </tr>
     </table>
@@ -46,14 +46,14 @@
                         </td>
                     </tr>
                     <tr>
-                        <td><button ng-click="undoAction()">Undo</button></td>
-                        <td><button ng-click="updateValueHandler()">Accept</button></td>
+                        <td><button ng-click="undoUpdate()">Undo</button></td>
+                        <td><button ng-click="update()">Update</button></td>
                     </tr>
                 </table>
             </td>
         </tr>
 
-        <tr ng-if="virtualTab.wasNewRecordAdded">
+        <tr ng-if="virtualTab.isNewRecordAdded()">
             <td ng-repeat="column in virtualTab.columns">
                 <p ng-if="virtualTab.isIdColumn(column)">*</p>
                 <input ng-model="recordSB[column]" class="{{recordSBStyle[$index]}}" type="{{virtualTab.getInputType(column)}}" ng-if="virtualTab.isNotIdAndForeignColumn(column)" ng-change="inputChanged($index,column,false)">
@@ -61,10 +61,10 @@
 				</select>
             </td>
         </tr>
-        <tr ng-if="virtualTab.wasNewRecordAdded">
+        <tr ng-if="virtualTab.isNewRecordAdded()">
             <td colspan="{{virtualTab.columnCount}}">
-                <button ng-click="undoSaveAction()">Undo</button>
-                <button ng-click="saveRecordHandler()">Save Record in DB</button>
+                <button ng-click="undoSave()">Undo</button>
+                <button ng-click="save()">Save Record in DB</button>
             </td>
         </tr>
     </table>

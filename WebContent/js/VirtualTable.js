@@ -28,9 +28,11 @@ class VirtualTable {
 
 		this.table = makeTwoDimArray(this.rowCount, this.columnCount, false);
 
-		this.wasNewRecordAdded = false;
-		this.newRecord = {};
+		this.newRecordAdded = false;
 	}
+
+	setNewRecordAdded(value) { this.newRecordAdded = value; }
+	isNewRecordAdded() { return this.newRecordAdded; }
 
 	//na siłę wpisane pod konkretną bazę danych
 	getInputType(column) {
@@ -62,14 +64,11 @@ class VirtualTable {
 		}
 	}
 
-	addNotSetRecord() {
-		if (this.wasNewRecordAdded)
-			alert("One Record was already added! Fill values and save record to DB!");
-		this.wasNewRecordAdded = true;
-		// forRange(this.columnCount, i => {
-		// 	this.newRecord[this.columns[i]] = this.getDefaultValuesBasedOnColumnType(this.columns[i]);
-		// });
-	}
+	// addNotSetRecord() {
+	// 	if (this.newRecordAdded)
+	// 		alert("One Record was already added! Fill values and save record to DB!");
+	// 	this.newRecordAdded = true;
+	// }
 
 	recordsEquals(recordA, recordB) {
 		for (var i = 0; i < this.columnCount; i++) {
@@ -84,9 +83,8 @@ class VirtualTable {
 		return records;
 	}
 
-	isIdColumn(column) {
-		return column == "id"; //na sztywno wpisana nazwa kolumny z kluczem id (a może być inna)
-	}
+	//na sztywno wpisana nazwa kolumny z kluczem id (a może być inna)
+	isIdColumn(column) { return column == "id"; }
 
 	getIndexOfForeignColumnIfExists(column) {
 		var result = -1;
@@ -114,16 +112,15 @@ class VirtualTable {
 	}
 
 	getUpdatedRecord() {
-		return (this.currentRowIndex != -1) ? this.records[this.currentRowIndex] : null;
+		return (this.currentRowIndex != -1) ? this.records[this.currentRowIndex] : "noRecordIsUpdated";
 	}
 
 	getUpdatedColumnName() {
-		return (this.currentColumnIndex != -1) ? this.columns[this.currentColumnIndex] : null;
+		return (this.currentColumnIndex != -1) ? this.columns[this.currentColumnIndex] : "noColumnIsUpdated";
 	}
 
-	setUpdatedFieldValue(value) {
-		this.records[this.currentRowIndex][this.columns[this.currentColumnIndex]] = value;
-	}
+	setUpdatedCellValue(value) {this.getUpdatedRecord()[this.getUpdatedColumnName()] = value;}
+	getUpdatedCellValue() {return this.getUpdatedRecord()[this.getUpdatedColumnName()];}
 
 	removeUpdatingUIElement() {
 		if (this.currentRowIndex != -1 && this.currentColumnIndex != -1)
@@ -132,7 +129,7 @@ class VirtualTable {
 
 	setTableValue(record, column, value) {
 		if (this.isOneAlreadyUpdated()) {
-			if (record != this.records[this.currentRowIndex] || column != this.columns[this.currentColumnIndex])
+			if (record != this.getUpdatedRecord() || column != this.getUpdatedColumnName())
 				alert("One is already updated! Update one first, then next one.");
 			return;
 		}
