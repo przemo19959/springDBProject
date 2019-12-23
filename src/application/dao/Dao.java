@@ -21,11 +21,11 @@ public class Dao {
 
 	@Autowired
 	private TransactionWrapper transactionWrapper;
-	
 	// CRUD operations
 	// C-Create
 	public <T> int save(T entity) {
 		return transactionWrapper.getTransactionResult(session -> {
+			System.out.println(getPrimaryKeyValue(entity));
 			session.save(entity);
 			return getPrimaryKeyValue(entity);
 		}, Integer.class);
@@ -71,6 +71,6 @@ public class Dao {
 				return field.getInt(entity);
 			}
 		}
-		return 0;
+		return -1;
 	}
 }

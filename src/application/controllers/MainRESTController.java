@@ -1,5 +1,6 @@
 package application.controllers;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +44,15 @@ public class MainRESTController {
 	}
 
 	@PutMapping(value = { "/{tableName}/{id}" })
-	public void update(@PathVariable String tableName, @RequestBody Object body, @PathVariable int id) {
-		daoService.update(tableName, body);
+	public ResponseEntity<ResponseDTO> update(@PathVariable String tableName, @PathVariable int id,
+			@RequestBody LinkedHashMap<String, Object> body) {
+		return new ResponseEntity<>(daoService.update(tableName, body), HttpStatus.OK);
 	}
 
 	@PostMapping(value = { "/{tableName}" })
-	public void save(@PathVariable String tableName, @RequestBody Object body) {
-		daoService.save(tableName,body);
+	public ResponseEntity<ResponseDTO> save(@PathVariable String tableName,
+			@RequestBody LinkedHashMap<String, Object> body) {
+		return new ResponseEntity<>(daoService.save(tableName, body), HttpStatus.CREATED);
 	}
 
 	// Exception Handlers
@@ -68,7 +71,7 @@ public class MainRESTController {
 	public ResponseEntity<ErrorHandler> constraintViolated(ConstraintException e) {
 		return new ResponseEntity<>(e.getErrorHandler(), HttpStatus.FORBIDDEN);
 	}
-	
+
 	@ExceptionHandler(NoSuchRecord.class)
 	public ResponseEntity<ErrorHandler> noRecordWithGivenId(NoSuchRecord e) {
 		return new ResponseEntity<>(e.getErrorHandler(), HttpStatus.NOT_FOUND);

@@ -41,12 +41,16 @@ class VirtualTable {
 		}
 	}
 
-	doesInputCorrect(column, value){
-		const datePattern=/\d{4}-\d{2}-\d{2}/;
-		switch(column){
-			case "id": return value>0;
-			case "dateOfRelease": return value.match(datePattern)!=null;
-			default: return value.length>0;
+	doesInputCorrect(column, value, isForeign) {
+		const datePattern = /\d{4}-\d{2}-\d{2}/;
+		switch (column) {
+			case "id": return true; //bowiem na siłę tam jest znak *
+			case "dateOfRelease": {
+				if (value == undefined)
+					return false;
+				return value.match(datePattern) != null;
+			}
+			default: return (isForeign) ? Object.keys(value).length > 0 : value.length > 0;
 		}
 	}
 
@@ -62,9 +66,9 @@ class VirtualTable {
 		if (this.wasNewRecordAdded)
 			alert("One Record was already added! Fill values and save record to DB!");
 		this.wasNewRecordAdded = true;
-		forRange(this.columnCount, i => {
-			this.newRecord[this.columns[i]] = this.getDefaultValuesBasedOnColumnType(this.columns[i]);
-		});
+		// forRange(this.columnCount, i => {
+		// 	this.newRecord[this.columns[i]] = this.getDefaultValuesBasedOnColumnType(this.columns[i]);
+		// });
 	}
 
 	recordsEquals(recordA, recordB) {
@@ -80,6 +84,10 @@ class VirtualTable {
 		return records;
 	}
 
+	isIdColumn(column) {
+		return column == "id"; //na sztywno wpisana nazwa kolumny z kluczem id (a może być inna)
+	}
+
 	getIndexOfForeignColumnIfExists(column) {
 		var result = -1;
 		if (column != undefined) {
@@ -91,6 +99,14 @@ class VirtualTable {
 			});
 		}
 		return result;
+	}
+
+	isNotIdAndForeignColumn(column) {
+		return (this.isIdColumn(column) == false && this.getIndexOfForeignColumnIfExists(column) == -1);
+	}
+
+	isNotIdAndNormalColumn(column) {
+		return (this.isIdColumn(column) == false && this.getIndexOfForeignColumnIfExists(column) != -1);
 	}
 
 	addForeignRecordsForColumn(response, arrayIndex) {
@@ -123,7 +139,7 @@ class VirtualTable {
 		forRange(this.rowCount, i => { if (this.recordsEquals(this.records[i], record)) this.currentRowIndex = i; });
 		forRange(this.columnCount, i => { if (this.columns[i] == column) this.currentColumnIndex = i; });
 		if (this.currentColumnIndex != -1 && this.currentRowIndex != -1);
-			this.table[this.currentRowIndex][this.currentColumnIndex] = value;
+		this.table[this.currentRowIndex][this.currentColumnIndex] = value;
 	}
 
 	getTableValue(record, column) {

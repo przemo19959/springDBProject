@@ -2,6 +2,7 @@ package application.controllers;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -41,6 +42,7 @@ import application.configs.root.TestConfig;
 import application.configs.web.WebConfig;
 import application.dao.Dao;
 import application.entities.Genre;
+import application.services.DaoService;
 import application.services.exceptions.ConstraintException;
 import application.services.exceptions.NoSuchRecord;
 import application.services.exceptions.TableNameRequestBodyException;
@@ -185,6 +187,7 @@ public class MainRESTControllerTest {
 				.content(requestJson))//
 //				.andDo(print())//
 				.andExpect(status().isOk())//
+				.andExpect(jsonPath("$.message").value(MessageFormat.format(DaoService.UPDATE_RESPONSE, genre.getId(),"Genre")))//
 				.andReturn();
 
 		mockMvc.perform(get("/mainPage/Genre/" + genre.getId()))//
@@ -264,10 +267,72 @@ public class MainRESTControllerTest {
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))//
 				.andExpect(jsonPath("$.errorMessage")
 						.value(MessageFormat.format(ConstraintException.ERROR_MESSAGE, //
-								ConstraintViolationException.class.getSimpleName(), "Genre")))//
+								 "Genre")))//
 				.andExpect(jsonPath("$.solutions").value(Arrays.stream(ConstraintException.SOLUTIONS)
 						.collect(Collectors.joining(", "))))//
 				.andReturn();
 	}
+	
+	@Test
+	@Order(12)
+	@DisplayName("save - returns proper response, when passed tableName is wrong")
+	public void test12() throws Exception {
+		Genre genre = new Genre();
+		genre.setId(1);
+		genre.setName("nowa fajna nazwa");
 
+		ObjectMapper mapper = new ObjectMapper();
+		String requestJson = mapper.writeValueAsString(genre);
+
+		mockMvc.perform(post("/mainPage/gfdfdd").contentType(MediaType.APPLICATION_JSON_UTF8)
+				.content(requestJson))//
+//				.andDo(print())//
+				.andExpect(status().isBadRequest())//
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(
+						jsonPath("$.errorMessage").value(MessageFormat.format(WrongTableNameException.ERROR_MESSAGE, //
+								ClassNotFoundException.class.getSimpleName(), "gfdfdd")))//
+				.andExpect(jsonPath("$.solutions").value(Arrays.stream(WrongTableNameException.SOLUTIONS)//
+						.collect(Collectors.joining(", "))))
+				.andReturn();
+	}
+	
+	@Test
+	@Order(13)
+	@DisplayName("save - method works fine")
+	public void test13() throws Exception {
+		String requestJson ="{\"id\":\"*\", \"name\":\"cos\"}";
+
+		mockMvc.perform(post("/mainPage/Genre").contentType(MediaType.APPLICATION_JSON_UTF8)
+				.content(requestJson))//
+//				.andDo(print())//
+				.andExpect(status().isCreated())//
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(
+						jsonPath("$.message").value(MessageFormat.format(DaoService.SAVE_RESPONSE, "Genre", 3)))//
+				.andReturn();
+		
+		assertEquals(1, dao.findAll(Genre.class).stream().filter(genre->genre.getName().equals("cos")).count());
+	}
+	
+	@Test
+	@Order(14)
+	@DisplayName("save - throws exception when constraint was broken")
+	public void test14() throws Exception {
+		String requestJson ="{\"id\":\"*\", \"name\":\"cos\"}";
+
+		mockMvc.perform(post("/mainPage/Genre").contentType(MediaType.APPLICATION_JSON_UTF8)
+				.content(requestJson))//
+//				.andDo(print())//
+				.andExpect(status().isForbidden())//
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(jsonPath("$.errorMessage")
+						.value(MessageFormat.format(ConstraintException.ERROR_MESSAGE, //
+								 "Genre")))//
+				.andExpect(jsonPath("$.solutions").value(Arrays.stream(ConstraintException.SOLUTIONS)
+						.collect(Collectors.joining(", "))))//
+				.andReturn();
+		
+		assertEquals(1, dao.findAll(Genre.class).stream().filter(genre->genre.getName().equals("cos")).count());
+	}
 }

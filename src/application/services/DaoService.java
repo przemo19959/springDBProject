@@ -1,5 +1,7 @@
 package application.services;
 
+import java.text.MessageFormat;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import application.controllers.ResponseDTO;
 import application.dao.Dao;
 import application.services.exceptions.ConstraintException;
 import application.services.exceptions.NoSuchRecord;
@@ -19,6 +22,9 @@ import application.services.exceptions.WrongTableNameException;
 
 @Service
 public class DaoService {
+	public static final String SAVE_RESPONSE = "Record was successfully created in table {0}! Assigned id has value {1}.";
+	public static final String UPDATE_RESPONSE = "Record with id {0} was successfully updated in table {1}!";
+
 	private static final String ENTITY_PACKET = "application.entities.";
 	@Autowired
 	private Dao dao;
@@ -32,7 +38,7 @@ public class DaoService {
 	@SuppressWarnings("unchecked")
 	public <T> T findById(String tableName, int id) {
 		Class<?> entityClass = getClassFromTableName(tableName);
-		T result=null;
+		T result = null;
 		try {
 			result = (T) dao.findById(id, entityClass).get();
 		} catch (NoSuchElementException e) {
@@ -41,34 +47,38 @@ public class DaoService {
 		return result;
 	}
 
-	public void update(String tableName, Object body) {
+	public ResponseDTO update(String tableName, LinkedHashMap<String, Object> body) {
 		Class<?> entityClass = getClassFromTableName(tableName);
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			dao.update(mapper.convertValue(body, entityClass)); // dodatkowe mapowanie, bo otrzymuje LinkedListMap
 		} catch (Exception e) {
 			if (e.getCause() instanceof ConstraintViolationException)
-				throw new ConstraintException(e, tableName);
+				throw new ConstraintException(tableName);
 			else if (e instanceof OptimisticLockException)
 				throw new TableNameRequestBodyException(e, tableName, body.toString());
 			e.printStackTrace();
 		}
+		return new ResponseDTO(MessageFormat.format(UPDATE_RESPONSE, body.get("id"), tableName));
 	}
 
-	public void save(String tableName,Object body) {
+	public ResponseDTO save(String tableName, LinkedHashMap<String, Object> body) {
 		System.out.println(body);
-		//TODO 22 gru 2019:napisaæ testy sprawdzaj¹ce t¹ metodê
+		body.put("id", "0"); // po stronie forntu nie jest ustawiana wartoœæ, przydziela j¹ DB
+		System.out.println(body);
 		Class<?> entityClass = getClassFromTableName(tableName);
 		ObjectMapper mapper = new ObjectMapper();
+		int result = -1;
 		try {
-			dao.save(mapper.convertValue(body, entityClass)); // dodatkowe mapowanie, bo otrzymuje LinkedListMap
+			result = dao.save(mapper.convertValue(body, entityClass));
 		} catch (Exception e) {
-			if (e.getCause() instanceof ConstraintViolationException)
-				throw new ConstraintException(e, tableName);
-			else if (e instanceof OptimisticLockException)
-				throw new TableNameRequestBodyException(e, tableName, body.toString());
+			if (e instanceof ConstraintViolationException)
+				throw new ConstraintException(tableName);
+//			else if (e instanceof OptimisticLockException)
+//				throw new TableNameRequestBodyException(e, tableName, body.toString());
 			e.printStackTrace();
 		}
+		return new ResponseDTO(MessageFormat.format(SAVE_RESPONSE, tableName, result));
 	}
 
 	// helper methods

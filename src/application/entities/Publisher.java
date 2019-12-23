@@ -15,7 +15,6 @@ import lombok.Data;
 public class Publisher {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="id")
 	private int id;
 	@Column(name="nazwa",unique=true)
 	private String name;
