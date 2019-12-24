@@ -24,6 +24,7 @@ import application.services.exceptions.WrongTableNameException;
 public class DaoService {
 	public static final String SAVE_RESPONSE = "Record was successfully created in table {0}! Assigned id has value {1}.";
 	public static final String UPDATE_RESPONSE = "Record with id {0} was successfully updated in table {1}!";
+	public static final String DELETE_RESPONSE = "Record with id {0} was successfully deleted from table {1}!";
 
 	private static final String ENTITY_PACKET = "application.entities.";
 	@Autowired
@@ -63,9 +64,7 @@ public class DaoService {
 	}
 
 	public ResponseDTO save(String tableName, LinkedHashMap<String, Object> body) {
-		System.out.println(body);
 		body.put("id", "0"); // po stronie forntu nie jest ustawiana wartoœæ, przydziela j¹ DB
-		System.out.println(body);
 		Class<?> entityClass = getClassFromTableName(tableName);
 		ObjectMapper mapper = new ObjectMapper();
 		int result = -1;
@@ -79,6 +78,18 @@ public class DaoService {
 			e.printStackTrace();
 		}
 		return new ResponseDTO(MessageFormat.format(SAVE_RESPONSE, tableName, result));
+	}
+
+	public ResponseDTO deleteById(String tableName, int id) {
+		Class<?> entityClass = getClassFromTableName(tableName);
+		Object recordToDelete=null;
+		try {
+			recordToDelete = dao.findById(id, entityClass).get();
+		} catch (NoSuchElementException e) {
+			throw new NoSuchRecord(e, tableName, id);
+		}
+		dao.delete(recordToDelete);
+		return new ResponseDTO(MessageFormat.format(DELETE_RESPONSE, id,tableName));
 	}
 
 	// helper methods

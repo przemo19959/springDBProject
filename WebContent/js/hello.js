@@ -12,8 +12,11 @@ const HTTP_NOT_FOUND = 404;
 const GET = "GET";
 const PUT = "PUT";
 const POST = "POST";
+const DELETE ="DELETE";
 
-myApp.controller('myAppController', ['$scope', '$http', '$filter', function ($scope, $http, $filter) {
+myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http) {
+	$scope.loading=false;
+
 	$scope.tables = [
 		{ name: "-- choose table --", value: "" },
 		{ name: "kategorie wiekowe", value: "AgeCategory" },
@@ -47,16 +50,21 @@ myApp.controller('myAppController', ['$scope', '$http', '$filter', function ($sc
 	$scope.findAll = function () {
 		if ($scope.tableCBox != $scope.tables[0]) {
 			$scope.recordSB = { id: "*" };
+			$scope.loading=true;
 			httpRequestTemplate($http, GET, mainURL + $scope.tableCBox.value, "",
 				function (response) {
 					// console.log(response.data);
+					$scope.loading=false;
 					if (response.data.length > 0) {
 						$scope.virtualTab = new VirtualTable(response, false);
 						forRange($scope.virtualTab.foreignColumns.length, i => {
+							$scope.loading=true;
 							httpRequestTemplate($http, GET, mainURL + $scope.virtualTab.foreignColumns[i]
 								, "", function (response) {
+									$scope.loading=false;
 									$scope.virtualTab.addForeignRecordsForColumn(response, i);
 								}, function (error) {
+									$scope.loading=false;
 									printErrorFromServer(error);
 								});
 						});
@@ -73,16 +81,21 @@ myApp.controller('myAppController', ['$scope', '$http', '$filter', function ($sc
 	$scope.idFieldChanged = function () { $scope.idInputStyle = ($scope.id > 0) ? "correct" : "error"; }
 	$scope.findById = function () {
 		if ($scope.tableCBox != $scope.tables[0] && $scope.idInputStyle == "correct") {
+			$scope.loading=true;
 			httpRequestTemplate($http, GET, mainURL + $scope.tableCBox.value + "/" + $scope.id, "",
 				function (response) {
 					// console.log(response.data);
+					$scope.loading=false;
 					if (response.status != HTTP_NOT_FOUND) {
 						$scope.virtualTab = new VirtualTable(response, true);
 						forRange($scope.virtualTab.foreignColumns.length, i => {
+							$scope.loading=true;
 							httpRequestTemplate($http, GET, mainURL + $scope.virtualTab.foreignColumns[i]
 								, "", function (response) {
+									$scope.loading=false;
 									$scope.virtualTab.addForeignRecordsForColumn(response, i);
 								}, function (error) {
+									$scope.loading=false;
 									printErrorFromServer(error);
 								});
 						});
@@ -108,10 +121,12 @@ myApp.controller('myAppController', ['$scope', '$http', '$filter', function ($sc
 		if (newValue.length > 0 || Object.keys(newValue).length > 0) {
 			$scope.virtualTab.setUpdatedCellValue(newValue);
 			const updatedRecord = $scope.virtualTab.getUpdatedRecord();
+			$scope.loading=true;
 			httpRequestTemplate($http, PUT,
 				mainURL + $scope.tableCBox.value + "/" + updatedRecord["id"], updatedRecord
 				, function (response) {
 					// console.log(response);
+					$scope.loading=false;
 					$scope.updateInputValue.value = "";
 					$scope.virtualTab.removeUpdatingUIElement();
 					if (response.status == HTTP_OK_CODE) {
@@ -121,6 +136,7 @@ myApp.controller('myAppController', ['$scope', '$http', '$filter', function ($sc
 					}
 				}, function (error) {
 					// console.log(error);
+					$scope.loading=false;
 					$scope.updateInputValue.value = "";
 					$scope.virtualTab.setUpdatedCellValue(previousValue);
 					printErrorFromServer(error);
@@ -183,15 +199,18 @@ myApp.controller('myAppController', ['$scope', '$http', '$filter', function ($sc
 		var recordToSave = getFormattedCopyOf($scope.recordSB, $scope.virtualTab.columns);
 		// console.log(recordToSave);
 
+		$scope.loading=true;
 		httpRequestTemplate($http, POST, mainURL + $scope.tableCBox.value, recordToSave
 			, function (response) {
 				// console.log(response);
+				$scope.loading=false;
 				if (response.status == HTTP_CREATED_CODE) {
 					printResponseFromServer(response);
 					$scope.findAll();
 				}
 			}, function (error) {
 				// console.log(error);
+				$scope.loading=false;
 				printErrorFromServer(error);
 			});
 	}
@@ -200,6 +219,29 @@ myApp.controller('myAppController', ['$scope', '$http', '$filter', function ($sc
 		$scope.virtualTab.setNewRecordAdded(false);
 		$scope.recordSB = { id: "*" };
 		$scope.recordSBStyle = ["correct"];
+	}
+
+	//D-Delete-deleteById
+	$scope.deleteById = function () {
+		if ($scope.tableCBox != $scope.tables[0] && $scope.idInputStyle == "correct") {
+			$scope.loading=true;
+			httpRequestTemplate($http,DELETE,mainURL+$scope.tableCBox.value+"/"+$scope.id,"",
+			function(response){
+				if(response.status==HTTP_OK_CODE){
+					$scope.loading=false;
+					$scope.findAll();
+					printResponseFromServer(response);
+				}
+			},
+			function(error){
+				$scope.loading=false;
+				printErrorFromServer(error);
+			});
+		} else if ($scope.tableCBox == $scope.tables[0]) {
+			alert("Table was't chosen!");
+		} else if ($scope.id < 1 || $scope.id == undefined) {
+			alert("Id value must be greater than 0, but is " + $scope.id + "!");
+		}
 	}
 }]);
 

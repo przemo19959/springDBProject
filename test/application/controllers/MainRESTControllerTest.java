@@ -119,9 +119,8 @@ public class MainRESTControllerTest {
 //				.andDo(print())//
 				.andExpect(status().isBadRequest())//
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(
-						jsonPath("$.errorMessage").value(MessageFormat.format(WrongTableNameException.ERROR_MESSAGE, //
-								ClassNotFoundException.class.getSimpleName(), "casdasd")))//
+				.andExpect(jsonPath("$.errorMessage").value(MessageFormat.format(WrongTableNameException.ERROR_MESSAGE, //
+						ClassNotFoundException.class.getSimpleName(), "casdasd")))//
 				.andExpect(jsonPath("$.solutions").value(Arrays.stream(WrongTableNameException.SOLUTIONS)//
 						.collect(Collectors.joining(", "))))
 				.andReturn();
@@ -148,9 +147,8 @@ public class MainRESTControllerTest {
 //				.andDo(print())//
 				.andExpect(status().isNotFound())//
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(
-						jsonPath("$.errorMessage").value(MessageFormat.format(NoSuchRecord.ERROR_MESSAGE, //
-								NoSuchElementException.class.getSimpleName(), "Genre",13)))//
+				.andExpect(jsonPath("$.errorMessage").value(MessageFormat.format(NoSuchRecord.ERROR_MESSAGE, //
+						NoSuchElementException.class.getSimpleName(), "Genre", 13)))//
 				.andExpect(jsonPath("$.solutions").value(Arrays.stream(NoSuchRecord.SOLUTIONS)//
 						.collect(Collectors.joining(", "))))
 				.andReturn();
@@ -164,9 +162,8 @@ public class MainRESTControllerTest {
 //				.andDo(print())//
 				.andExpect(status().isBadRequest())//
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(
-						jsonPath("$.errorMessage").value(MessageFormat.format(WrongTableNameException.ERROR_MESSAGE, //
-								ClassNotFoundException.class.getSimpleName(), "casdasd")))//
+				.andExpect(jsonPath("$.errorMessage").value(MessageFormat.format(WrongTableNameException.ERROR_MESSAGE, //
+						ClassNotFoundException.class.getSimpleName(), "casdasd")))//
 				.andExpect(jsonPath("$.solutions").value(Arrays.stream(WrongTableNameException.SOLUTIONS)//
 						.collect(Collectors.joining(", "))))
 				.andReturn();
@@ -187,7 +184,8 @@ public class MainRESTControllerTest {
 				.content(requestJson))//
 //				.andDo(print())//
 				.andExpect(status().isOk())//
-				.andExpect(jsonPath("$.message").value(MessageFormat.format(DaoService.UPDATE_RESPONSE, genre.getId(),"Genre")))//
+				.andExpect(jsonPath("$.message")
+						.value(MessageFormat.format(DaoService.UPDATE_RESPONSE, genre.getId(), "Genre")))//
 				.andReturn();
 
 		mockMvc.perform(get("/mainPage/Genre/" + genre.getId()))//
@@ -215,9 +213,8 @@ public class MainRESTControllerTest {
 //				.andDo(print())//
 				.andExpect(status().isBadRequest())//
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(
-						jsonPath("$.errorMessage").value(MessageFormat.format(WrongTableNameException.ERROR_MESSAGE, //
-								ClassNotFoundException.class.getSimpleName(), "asdads")))//
+				.andExpect(jsonPath("$.errorMessage").value(MessageFormat.format(WrongTableNameException.ERROR_MESSAGE, //
+						ClassNotFoundException.class.getSimpleName(), "asdads")))//
 				.andExpect(jsonPath("$.solutions").value(Arrays.stream(WrongTableNameException.SOLUTIONS)//
 						.collect(Collectors.joining(", "))))
 				.andReturn();
@@ -265,14 +262,13 @@ public class MainRESTControllerTest {
 //				.andDo(print())//
 				.andExpect(status().isForbidden())//
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))//
-				.andExpect(jsonPath("$.errorMessage")
-						.value(MessageFormat.format(ConstraintException.ERROR_MESSAGE, //
-								 "Genre")))//
-				.andExpect(jsonPath("$.solutions").value(Arrays.stream(ConstraintException.SOLUTIONS)
-						.collect(Collectors.joining(", "))))//
+				.andExpect(jsonPath("$.errorMessage").value(MessageFormat.format(ConstraintException.ERROR_MESSAGE, //
+						"Genre")))//
+				.andExpect(jsonPath("$.solutions")
+						.value(Arrays.stream(ConstraintException.SOLUTIONS).collect(Collectors.joining(", "))))//
 				.andReturn();
 	}
-	
+
 	@Test
 	@Order(12)
 	@DisplayName("save - returns proper response, when passed tableName is wrong")
@@ -284,55 +280,89 @@ public class MainRESTControllerTest {
 		ObjectMapper mapper = new ObjectMapper();
 		String requestJson = mapper.writeValueAsString(genre);
 
-		mockMvc.perform(post("/mainPage/gfdfdd").contentType(MediaType.APPLICATION_JSON_UTF8)
-				.content(requestJson))//
+		mockMvc.perform(post("/mainPage/gfdfdd").contentType(MediaType.APPLICATION_JSON_UTF8).content(requestJson))//
 //				.andDo(print())//
 				.andExpect(status().isBadRequest())//
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(
-						jsonPath("$.errorMessage").value(MessageFormat.format(WrongTableNameException.ERROR_MESSAGE, //
-								ClassNotFoundException.class.getSimpleName(), "gfdfdd")))//
+				.andExpect(jsonPath("$.errorMessage").value(MessageFormat.format(WrongTableNameException.ERROR_MESSAGE, //
+						ClassNotFoundException.class.getSimpleName(), "gfdfdd")))//
 				.andExpect(jsonPath("$.solutions").value(Arrays.stream(WrongTableNameException.SOLUTIONS)//
 						.collect(Collectors.joining(", "))))
 				.andReturn();
 	}
-	
+
 	@Test
 	@Order(13)
 	@DisplayName("save - method works fine")
 	public void test13() throws Exception {
-		String requestJson ="{\"id\":\"*\", \"name\":\"cos\"}";
+		String requestJson = "{\"id\":\"*\", \"name\":\"cos\"}";
 
-		mockMvc.perform(post("/mainPage/Genre").contentType(MediaType.APPLICATION_JSON_UTF8)
-				.content(requestJson))//
+		mockMvc.perform(post("/mainPage/Genre").contentType(MediaType.APPLICATION_JSON_UTF8).content(requestJson))//
 //				.andDo(print())//
 				.andExpect(status().isCreated())//
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(
-						jsonPath("$.message").value(MessageFormat.format(DaoService.SAVE_RESPONSE, "Genre", 3)))//
+				.andExpect(jsonPath("$.message").value(MessageFormat.format(DaoService.SAVE_RESPONSE, "Genre", 3)))//
 				.andReturn();
-		
-		assertEquals(1, dao.findAll(Genre.class).stream().filter(genre->genre.getName().equals("cos")).count());
+
+		assertEquals(1, dao.findAll(Genre.class).stream().filter(genre -> genre.getName().equals("cos")).count());
 	}
-	
+
 	@Test
 	@Order(14)
 	@DisplayName("save - throws exception when constraint was broken")
 	public void test14() throws Exception {
-		String requestJson ="{\"id\":\"*\", \"name\":\"cos\"}";
+		String requestJson = "{\"id\":\"*\", \"name\":\"cos\"}";
 
-		mockMvc.perform(post("/mainPage/Genre").contentType(MediaType.APPLICATION_JSON_UTF8)
-				.content(requestJson))//
+		mockMvc.perform(post("/mainPage/Genre").contentType(MediaType.APPLICATION_JSON_UTF8).content(requestJson))//
 //				.andDo(print())//
 				.andExpect(status().isForbidden())//
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(jsonPath("$.errorMessage")
-						.value(MessageFormat.format(ConstraintException.ERROR_MESSAGE, //
-								 "Genre")))//
-				.andExpect(jsonPath("$.solutions").value(Arrays.stream(ConstraintException.SOLUTIONS)
-						.collect(Collectors.joining(", "))))//
+				.andExpect(jsonPath("$.errorMessage").value(MessageFormat.format(ConstraintException.ERROR_MESSAGE, //
+						"Genre")))//
+				.andExpect(jsonPath("$.solutions")
+						.value(Arrays.stream(ConstraintException.SOLUTIONS).collect(Collectors.joining(", "))))//
 				.andReturn();
-		
-		assertEquals(1, dao.findAll(Genre.class).stream().filter(genre->genre.getName().equals("cos")).count());
+
+		assertEquals(1, dao.findAll(Genre.class).stream().filter(genre -> genre.getName().equals("cos")).count());
+	}
+
+	@Test
+	@Order(15)
+	@DisplayName("deleteById - returns proper response, when passed tableName is wrong")
+	public void test15() throws Exception {
+		mockMvc.perform(delete("/mainPage/ddfdd/12").contentType(MediaType.APPLICATION_JSON_UTF8))
+//				.andDo(print())//
+				.andExpect(status().isBadRequest())//
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(jsonPath("$.errorMessage").value(MessageFormat.format(WrongTableNameException.ERROR_MESSAGE, //
+						ClassNotFoundException.class.getSimpleName(), "ddfdd")))//
+				.andExpect(jsonPath("$.solutions").value(Arrays.stream(WrongTableNameException.SOLUTIONS)//
+						.collect(Collectors.joining(", "))))
+				.andReturn();
+	}
+
+	@Test
+	@Order(16)
+	@DisplayName("deleteById - returns proper response, when id is wrong or record with given id doesn't exist")
+	public void test16() throws Exception {
+		mockMvc.perform(delete("/mainPage/Genre/122").contentType(MediaType.APPLICATION_JSON_UTF8))
+//				.andDo(print())//
+				.andExpect(status().isNotFound())//
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(jsonPath("$.errorMessage").value(MessageFormat.format(NoSuchRecord.ERROR_MESSAGE,
+						NoSuchElementException.class.getSimpleName(), "Genre", 122)))//
+				.andExpect(jsonPath("$.solutions").value(Arrays.stream(NoSuchRecord.SOLUTIONS)//
+						.collect(Collectors.joining(", "))))
+				.andReturn();
+
+		mockMvc.perform(delete("/mainPage/Genre/-22").contentType(MediaType.APPLICATION_JSON_UTF8))
+//		.andDo(print())//
+				.andExpect(status().isNotFound())//
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(jsonPath("$.errorMessage").value(MessageFormat.format(NoSuchRecord.ERROR_MESSAGE,
+						NoSuchElementException.class.getSimpleName(), "Genre", -22)))//
+				.andExpect(jsonPath("$.solutions").value(Arrays.stream(NoSuchRecord.SOLUTIONS)//
+						.collect(Collectors.joining(", "))))
+				.andReturn();
 	}
 }
