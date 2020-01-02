@@ -108,5 +108,12 @@ class DatabaseDaoTest {
 		assertThrows(PersistenceException.class, ()->dao.update(genre.get()));
 	}
 	
+	@Test
+	@DisplayName("get columns names works fine")
+	void test7() {
+		//TODO 2 sty 2020:dodaæ testy nowej metody pobieraj¹cej nazwy kolumn tabeli. Jest to konieczne w przypadku, gdy baza danych jest pusta i
+		//nie wszystkie pola s¹ inicjowane w JS w obiekcie VirtualTable
+	}
+	
 	
 }

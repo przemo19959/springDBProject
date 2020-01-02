@@ -18,9 +18,12 @@ public class Dao {
 	// queries
 	private static final String FIND_ALL = "SELECT * FROM {0};";
 	private static final String FIND_BY_ID = "SELECT * FROM {0} WHERE id= {1};";
+	private static final String FIND_ALL_COLUMNS = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
+			+ "WHERE TABLE_NAME = '{0}' ORDER BY ORDINAL_POSITION;";
 
 	@Autowired
 	private TransactionWrapper transactionWrapper;
+
 	// CRUD operations
 	// C-Create
 	public <T> int save(T entity) {
@@ -42,21 +45,31 @@ public class Dao {
 
 	@SuppressWarnings("unchecked")
 	public <T> Optional<T> findById(int id, Class<T> resultType) {
-		return transactionWrapper.getTransactionResult(session->session.createNativeQuery(MessageFormat.format(FIND_BY_ID, getTableName(resultType), id), resultType)
+		return transactionWrapper.getTransactionResult(session -> session
+				.createNativeQuery(MessageFormat.format(FIND_BY_ID, getTableName(resultType), id), resultType)
 				.uniqueResultOptional(), Optional.class);
 	}
 
 	// U-Update
 	public <T> void update(T entity) {
-		transactionWrapper.performTransaction(session->session.update(entity));
+		transactionWrapper.performTransaction(session -> session.update(entity));
 	}
 
 	// D-Delete
 	public <T> void delete(T entity) {
-		transactionWrapper.performTransaction(session->session.delete(entity));
+		transactionWrapper.performTransaction(session -> session.delete(entity));
 	}
-	
+
 	// Other methods
+	@SuppressWarnings("unchecked")
+	public <T> List<String> getColumnNames(Class<T> entityClass) {
+		return transactionWrapper
+				.getTransactionResult(
+						session -> session.createNativeQuery(
+								MessageFormat.format(FIND_ALL_COLUMNS, getTableName(entityClass)), String.class).list(),
+						List.class);
+	}
+
 	private <T> String getTableName(Class<T> type) {
 		if (type.isAnnotationPresent(Table.class))
 			return type.getAnnotation(Table.class).name();

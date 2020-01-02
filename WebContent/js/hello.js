@@ -12,10 +12,10 @@ const HTTP_NOT_FOUND = 404;
 const GET = "GET";
 const PUT = "PUT";
 const POST = "POST";
-const DELETE ="DELETE";
+const DELETE = "DELETE";
 
 myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http) {
-	$scope.loading=false;
+	$scope.loading = false;
 
 	$scope.tables = [
 		{ name: "-- choose table --", value: "" },
@@ -50,28 +50,31 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 	$scope.findAll = function () {
 		if ($scope.tableCBox != $scope.tables[0]) {
 			$scope.recordSB = { id: "*" };
-			$scope.loading=true;
+			$scope.loading = true;
 			httpRequestTemplate($http, GET, mainURL + $scope.tableCBox.value, "",
 				function (response) {
-					// console.log(response.data);
-					$scope.loading=false;
+					console.log(response.data);
+					$scope.loading = false;
+
 					if (response.data.length > 0) {
 						$scope.virtualTab = new VirtualTable(response, false);
 						forRange($scope.virtualTab.foreignColumns.length, i => {
-							$scope.loading=true;
+							$scope.loading = true;
 							httpRequestTemplate($http, GET, mainURL + $scope.virtualTab.foreignColumns[i]
 								, "", function (response) {
-									$scope.loading=false;
+									$scope.loading = false;
 									$scope.virtualTab.addForeignRecordsForColumn(response, i);
 								}, function (error) {
-									$scope.loading=false;
+									$scope.loading = false;
 									printErrorFromServer(error);
 								});
 						});
 					} else {
+						// if (response.data.length == 0) {
 						alert("Table " + $scope.tableCBox.name + " is empty!");
 					}
 				}, function (error) {
+					$scope.loading = false;
 					printErrorFromServer(error);
 				});
 		}
@@ -81,26 +84,27 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 	$scope.idFieldChanged = function () { $scope.idInputStyle = ($scope.id > 0) ? "correct" : "error"; }
 	$scope.findById = function () {
 		if ($scope.tableCBox != $scope.tables[0] && $scope.idInputStyle == "correct") {
-			$scope.loading=true;
+			$scope.loading = true;
 			httpRequestTemplate($http, GET, mainURL + $scope.tableCBox.value + "/" + $scope.id, "",
 				function (response) {
 					// console.log(response.data);
-					$scope.loading=false;
+					$scope.loading = false;
 					if (response.status != HTTP_NOT_FOUND) {
 						$scope.virtualTab = new VirtualTable(response, true);
 						forRange($scope.virtualTab.foreignColumns.length, i => {
-							$scope.loading=true;
+							$scope.loading = true;
 							httpRequestTemplate($http, GET, mainURL + $scope.virtualTab.foreignColumns[i]
 								, "", function (response) {
-									$scope.loading=false;
+									$scope.loading = false;
 									$scope.virtualTab.addForeignRecordsForColumn(response, i);
 								}, function (error) {
-									$scope.loading=false;
+									$scope.loading = false;
 									printErrorFromServer(error);
 								});
 						});
 					}
 				}, function (error) {
+					$scope.loading = false;
 					printErrorFromServer(error);
 				});
 		} else if ($scope.tableCBox == $scope.tables[0]) {
@@ -121,12 +125,12 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 		if (newValue.length > 0 || Object.keys(newValue).length > 0) {
 			$scope.virtualTab.setUpdatedCellValue(newValue);
 			const updatedRecord = $scope.virtualTab.getUpdatedRecord();
-			$scope.loading=true;
+			$scope.loading = true;
 			httpRequestTemplate($http, PUT,
 				mainURL + $scope.tableCBox.value + "/" + updatedRecord["id"], updatedRecord
 				, function (response) {
 					// console.log(response);
-					$scope.loading=false;
+					$scope.loading = false;
 					$scope.updateInputValue.value = "";
 					$scope.virtualTab.removeUpdatingUIElement();
 					if (response.status == HTTP_OK_CODE) {
@@ -136,7 +140,7 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 					}
 				}, function (error) {
 					// console.log(error);
-					$scope.loading=false;
+					$scope.loading = false;
 					$scope.updateInputValue.value = "";
 					$scope.virtualTab.setUpdatedCellValue(previousValue);
 					printErrorFromServer(error);
@@ -160,6 +164,8 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 		if ($scope.virtualTab != undefined && $scope.virtualTab.isNewRecordAdded()) {
 			alert("One record was already added! Fill values and save record to DB!");
 			return;
+		} else {
+
 		}
 		if ($scope.tableCBox != $scope.tables[0]) {
 			forRange($scope.virtualTab.columnCount, i => {
@@ -199,18 +205,18 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 		var recordToSave = getFormattedCopyOf($scope.recordSB, $scope.virtualTab.columns);
 		// console.log(recordToSave);
 
-		$scope.loading=true;
+		$scope.loading = true;
 		httpRequestTemplate($http, POST, mainURL + $scope.tableCBox.value, recordToSave
 			, function (response) {
 				// console.log(response);
-				$scope.loading=false;
+				$scope.loading = false;
 				if (response.status == HTTP_CREATED_CODE) {
 					printResponseFromServer(response);
 					$scope.findAll();
 				}
 			}, function (error) {
 				// console.log(error);
-				$scope.loading=false;
+				$scope.loading = false;
 				printErrorFromServer(error);
 			});
 	}
@@ -224,19 +230,19 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 	//D-Delete-deleteById
 	$scope.deleteById = function () {
 		if ($scope.tableCBox != $scope.tables[0] && $scope.idInputStyle == "correct") {
-			$scope.loading=true;
-			httpRequestTemplate($http,DELETE,mainURL+$scope.tableCBox.value+"/"+$scope.id,"",
-			function(response){
-				if(response.status==HTTP_OK_CODE){
-					$scope.loading=false;
-					$scope.findAll();
-					printResponseFromServer(response);
-				}
-			},
-			function(error){
-				$scope.loading=false;
-				printErrorFromServer(error);
-			});
+			$scope.loading = true;
+			httpRequestTemplate($http, DELETE, mainURL + $scope.tableCBox.value + "/" + $scope.id, "",
+				function (response) {
+					if (response.status == HTTP_OK_CODE) {
+						$scope.loading = false;
+						$scope.findAll();
+						printResponseFromServer(response);
+					}
+				},
+				function (error) {
+					$scope.loading = false;
+					printErrorFromServer(error);
+				});
 		} else if ($scope.tableCBox == $scope.tables[0]) {
 			alert("Table was't chosen!");
 		} else if ($scope.id < 1 || $scope.id == undefined) {
