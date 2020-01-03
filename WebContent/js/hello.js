@@ -49,11 +49,12 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 	$scope.virtualTab;
 	$scope.findAll = function () {
 		if ($scope.tableCBox != $scope.tables[0]) {
-			$scope.recordSB = { id: "*" };
+			// $scope.recordSB = { id: "*" };
+			$scope.undoSave();
 			$scope.loading = true;
 			httpRequestTemplate($http, GET, mainURL + $scope.tableCBox.value, "",
 				function (response) {
-					console.log(response.data);
+					// console.log(response.data);
 					$scope.loading = false;
 
 					if (response.data.length > 0) {
@@ -69,8 +70,8 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 									printErrorFromServer(error);
 								});
 						});
+						// console.log($scope.virtualTab.foreignRecordsForEachForeignColumn);
 					} else {
-						// if (response.data.length == 0) {
 						alert("Table " + $scope.tableCBox.name + " is empty!");
 					}
 				}, function (error) {
@@ -222,9 +223,11 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 	}
 
 	$scope.undoSave = function () {
-		$scope.virtualTab.setNewRecordAdded(false);
-		$scope.recordSB = { id: "*" };
-		$scope.recordSBStyle = ["correct"];
+		if ($scope.virtualTab != undefined) {
+			$scope.virtualTab.setNewRecordAdded(false);
+			$scope.recordSB = { id: "*" };
+			$scope.recordSBStyle = ["correct"];
+		}
 	}
 
 	//D-Delete-deleteById

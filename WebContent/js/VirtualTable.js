@@ -3,22 +3,39 @@
  */
 class VirtualTable {
 	constructor(response, findById) {
-		if (findById) {
-			this.records = [];
-			this.records[0] = response.data;
-		} else {
-			this.records = response.data; //otrzymane rekordy
-		}
-
-		this.columns = Object.keys(this.records[0]); //nazwy kolumn rekordów
 		this.foreignColumns = [];
 		this.foreignRecordsForEachForeignColumn = [];
-		forRange(this.columns.length, i => {
-			var keys = Object.keys(this.records[0][this.columns[i]]);
-			if (keys.length > 0 && typeof this.records[0][this.columns[i]] != 'string') {
-				this.foreignColumns.push(this.columns[i][0].toUpperCase() + this.columns[i].slice(1));
+
+		if (Array.isArray(response.data)
+			&& response.data.length > 0 && typeof response.data[0] == 'string') {
+			this.records = [];
+			this.columns = [];
+			// console.log(response.data);
+			forRange(response.data.length, i => {
+				if (response.data[i].startsWith("fk_")) {
+					this.columns[i] = response.data[i].slice(3);
+					this.foreignColumns.push(this.columns[i][0].toUpperCase() + this.columns[i].slice(1));
+				} else {
+					this.columns[i] = response.data[i];
+				}
+			});
+			console.log(this.foreignColumns);
+		} else {
+			if (findById) {
+				this.records = [];
+				this.records[0] = response.data;
+			} else {
+				this.records = response.data; //otrzymane rekordy
 			}
-		});
+			this.columns = Object.keys(this.records[0]); //nazwy kolumn }rekordów
+
+			forRange(this.columns.length, i => {
+				var keys = Object.keys(this.records[0][this.columns[i]]);
+				if (keys.length > 0 && typeof this.records[0][this.columns[i]] != 'string') {
+					this.foreignColumns.push(this.columns[i][0].toUpperCase() + this.columns[i].slice(1));
+				}
+			});
+		}
 		this.rowCount = this.records.length;
 		this.columnCount = this.columns.length;
 
@@ -108,7 +125,12 @@ class VirtualTable {
 	}
 
 	addForeignRecordsForColumn(response, arrayIndex) {
-		this.foreignRecordsForEachForeignColumn[arrayIndex] = (response.data);
+		if (Array.isArray(response.data) && response.data.length > 0 && typeof response.data[0] == 'string') {
+
+		} else {
+			this.foreignRecordsForEachForeignColumn[arrayIndex] = (response.data);
+			console.log("added");
+		}
 	}
 
 	getUpdatedRecord() {
@@ -119,8 +141,8 @@ class VirtualTable {
 		return (this.currentColumnIndex != -1) ? this.columns[this.currentColumnIndex] : "noColumnIsUpdated";
 	}
 
-	setUpdatedCellValue(value) {this.getUpdatedRecord()[this.getUpdatedColumnName()] = value;}
-	getUpdatedCellValue() {return this.getUpdatedRecord()[this.getUpdatedColumnName()];}
+	setUpdatedCellValue(value) { this.getUpdatedRecord()[this.getUpdatedColumnName()] = value; }
+	getUpdatedCellValue() { return this.getUpdatedRecord()[this.getUpdatedColumnName()]; }
 
 	removeUpdatingUIElement() {
 		if (this.currentRowIndex != -1 && this.currentColumnIndex != -1)

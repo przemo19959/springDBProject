@@ -2,10 +2,13 @@ package application.dao;
 
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.Column;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +22,7 @@ public class Dao {
 	private static final String FIND_ALL = "SELECT * FROM {0};";
 	private static final String FIND_BY_ID = "SELECT * FROM {0} WHERE id= {1};";
 	private static final String FIND_ALL_COLUMNS = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
-			+ "WHERE TABLE_NAME = '{0}' ORDER BY ORDINAL_POSITION;";
+			+ "WHERE TABLE_NAME = ''{0}'' ORDER BY ORDINAL_POSITION;";
 
 	@Autowired
 	private TransactionWrapper transactionWrapper;
@@ -61,15 +64,28 @@ public class Dao {
 	}
 
 	// Other methods
-	@SuppressWarnings("unchecked")
 	public <T> List<String> getColumnNames(Class<T> entityClass) {
-		return transactionWrapper
-				.getTransactionResult(
-						session -> session.createNativeQuery(
-								MessageFormat.format(FIND_ALL_COLUMNS, getTableName(entityClass)), String.class).list(),
-						List.class);
+		List<String> result=new ArrayList<>();
+		for(Field field:entityClass.getDeclaredFields()) {
+			if(field.isAnnotationPresent(Id.class) || field.isAnnotationPresent(Column.class)) {
+				result.add(field.getName());
+			}else if(field.isAnnotationPresent(JoinColumn.class)) {
+				result.add("fk_"+field.getName());
+			}
+		}
+		return result;
 	}
-
+	
+//	public <T> List<String> getForeignColumnNames(Class<T> entityClass){
+//		List<String> result=new ArrayList<>();
+//		for(Field field:entityClass.getDeclaredFields()) {
+//			if(field.isAnnotationPresent(JoinColumn.class)) {
+//				result.add(field.getName());
+//			}
+//		}
+//		return result;
+//	}
+	
 	private <T> String getTableName(Class<T> type) {
 		if (type.isAnnotationPresent(Table.class))
 			return type.getAnnotation(Table.class).name();
@@ -87,3 +103,4 @@ public class Dao {
 		return -1;
 	}
 }
+ 
