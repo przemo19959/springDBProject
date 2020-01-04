@@ -70,7 +70,6 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 									printErrorFromServer(error);
 								});
 						});
-						// console.log($scope.virtualTab.foreignRecordsForEachForeignColumn);
 					} else {
 						alert("Table " + $scope.tableCBox.name + " is empty!");
 					}
@@ -122,7 +121,6 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 		const previousValue = $scope.virtualTab.getUpdatedCellValue();
 		const newValue = getFormatedDateIfDateObject($scope.updateInputValue.value);
 
-		//todo-tutaj poprawić, bo nie można aktualizować kolumn z kluczem głównym
 		if (newValue.length > 0 || Object.keys(newValue).length > 0) {
 			$scope.virtualTab.setUpdatedCellValue(newValue);
 			const updatedRecord = $scope.virtualTab.getUpdatedRecord();

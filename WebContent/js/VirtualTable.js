@@ -19,7 +19,6 @@ class VirtualTable {
 					this.columns[i] = response.data[i];
 				}
 			});
-			console.log(this.foreignColumns);
 		} else {
 			if (findById) {
 				this.records = [];
@@ -129,7 +128,6 @@ class VirtualTable {
 
 		} else {
 			this.foreignRecordsForEachForeignColumn[arrayIndex] = (response.data);
-			console.log("added");
 		}
 	}
 
@@ -155,6 +153,13 @@ class VirtualTable {
 				alert("One is already updated! Update one first, then next one.");
 			return;
 		}
+
+		//na sztywno wpisana nazwa kolumny id
+		if(column=="id"){
+			alert("Primary key can't be updated. PK are assigned automatically by persitance provider!");
+			return;
+		}
+
 		forRange(this.rowCount, i => { if (this.recordsEquals(this.records[i], record)) this.currentRowIndex = i; });
 		forRange(this.columnCount, i => { if (this.columns[i] == column) this.currentColumnIndex = i; });
 		if (this.currentColumnIndex != -1 && this.currentRowIndex != -1);
