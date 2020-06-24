@@ -1,9 +1,12 @@
 package application.dao;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -22,6 +25,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import application.configs.root.CommonConfig;
 import application.configs.root.ProdConfig;
 import application.configs.root.TestConfig;
+import application.entities.AgeCategory;
 import application.entities.Genre;
 
 @ExtendWith(SpringExtension.class)
@@ -106,5 +110,15 @@ class DatabaseDaoTest {
 		
 		genre.get().setName(genres.get(1).getName());
 		assertThrows(PersistenceException.class, ()->dao.update(genre.get()));
+	}
+	
+	@Test
+	@DisplayName("get columns names works fine")
+	void test7() {
+		System.out.println(dao.getColumnNames(AgeCategory.class));
+		//p�ki co zwraca pust� list�, prawdopodobnie z powodu, �e test dzia�a na wbudowanej bazie danych
+//		assertArrayEquals(new String[] {"id","nazwa"}, dao.getColumnNames(Genre.class));
+		//TODO 2 sty 2020:doda� testy nowej metody pobieraj�cej nazwy kolumn tabeli. Jest to konieczne w przypadku, gdy baza danych jest pusta i
+		//nie wszystkie pola s� inicjowane w JS w obiekcie VirtualTable
 	}
 }

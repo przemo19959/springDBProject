@@ -33,7 +33,10 @@ public class DaoService {
 	@SuppressWarnings("unchecked")
 	public <T> List<T> findAll(String tableName) {
 		Class<?> entityClass = getClassFromTableName(tableName);
-		return (List<T>) dao.findAll(entityClass);
+		List<T> result=(List<T>) dao.findAll(entityClass);
+		if(result.size()==0)
+			return (List<T>) dao.getColumnNames(entityClass);
+		return result;
 	}
 
 	@SuppressWarnings("unchecked")

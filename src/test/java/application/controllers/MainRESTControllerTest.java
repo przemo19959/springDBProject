@@ -82,13 +82,13 @@ public class MainRESTControllerTest {
 
 	@Test
 	@Order(2)
-	@DisplayName("findAll - response is empty, when DB is empty")
+	@DisplayName("findAll - response returns column names, when DB is empty")
 	public void test2() throws Exception {
 		mockMvc.perform(get("/mainPage/Genre"))//
 //					.andDo(print())//
 				.andExpect(status().isOk())//
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))//
-				.andExpect(content().string("[]")).andReturn();
+				.andExpect(content().string("[\"id\",\"nazwa\"]")).andReturn();
 	}
 
 	@Test
