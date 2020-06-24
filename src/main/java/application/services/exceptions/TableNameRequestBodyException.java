@@ -8,6 +8,7 @@ import application.controllers.ErrorHandler;
 import application.services.MyException;
 import lombok.Getter;
 
+@SuppressWarnings("serial")
 @Getter
 public class TableNameRequestBodyException extends MyException {
 	public static final String ERROR_MESSAGE = "{0}: Table {1} doesn''t match request body {2}!";

@@ -64,7 +64,7 @@ public class DaoService {
 	}
 
 	public ResponseDTO save(String tableName, LinkedHashMap<String, Object> body) {
-		body.put("id", "0"); // po stronie forntu nie jest ustawiana wartoœæ, przydziela j¹ DB
+		body.put("id", "0"); // po stronie forntu nie jest ustawiana wartosc, przydziela ja DB
 		Class<?> entityClass = getClassFromTableName(tableName);
 		ObjectMapper mapper = new ObjectMapper();
 		int result = -1;
