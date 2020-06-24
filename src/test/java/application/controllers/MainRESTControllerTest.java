@@ -3,13 +3,8 @@ package application.controllers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -82,13 +77,13 @@ public class MainRESTControllerTest {
 
 	@Test
 	@Order(2)
-	@DisplayName("findAll - response is empty, when DB is empty")
+	@DisplayName("findAll - response returns column names, when DB is empty")
 	public void test2() throws Exception {
 		mockMvc.perform(get("/mainPage/Genre"))//
 //					.andDo(print())//
 				.andExpect(status().isOk())//
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))//
-				.andExpect(content().string("[]")).andReturn();
+				.andExpect(content().string("[\"id\",\"nazwa\"]")).andReturn();
 	}
 
 	@Test

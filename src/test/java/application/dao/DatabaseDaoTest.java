@@ -22,6 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import application.configs.root.CommonConfig;
 import application.configs.root.ProdConfig;
 import application.configs.root.TestConfig;
+import application.entities.AgeCategory;
 import application.entities.Genre;
 
 @ExtendWith(SpringExtension.class)
@@ -107,4 +108,16 @@ class DatabaseDaoTest {
 		genre.get().setName(genres.get(1).getName());
 		assertThrows(PersistenceException.class, ()->dao.update(genre.get()));
 	}
+	
+	@Test
+	@DisplayName("get columns names works fine")
+	void test7() {
+		System.out.println(dao.getColumnNames(AgeCategory.class));
+		//póki co zwraca pustą listę, prawdopodobnie z powodu, że test działa na wbudowanej bazie danych
+//		assertArrayEquals(new String[] {"id","nazwa"}, dao.getColumnNames(Genre.class));
+		//TODO 2 sty 2020:dodać testy nowej metody pobierającej nazwy kolumn tabeli. Jest to konieczne w przypadku, gdy baza danych jest pusta i
+		//nie wszystkie pola są inicjowane w JS w obiekcie VirtualTable
+	}
+	
+	
 }

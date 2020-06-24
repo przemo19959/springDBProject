@@ -3,22 +3,38 @@
  */
 class VirtualTable {
 	constructor(response, findById) {
-		if (findById) {
-			this.records = [];
-			this.records[0] = response.data;
-		} else {
-			this.records = response.data; //otrzymane rekordy
-		}
-
-		this.columns = Object.keys(this.records[0]); //nazwy kolumn rekordów
 		this.foreignColumns = [];
 		this.foreignRecordsForEachForeignColumn = [];
-		forRange(this.columns.length, i => {
-			var keys = Object.keys(this.records[0][this.columns[i]]);
-			if (keys.length > 0 && typeof this.records[0][this.columns[i]] != 'string') {
-				this.foreignColumns.push(this.columns[i][0].toUpperCase() + this.columns[i].slice(1));
+
+		if (Array.isArray(response.data)
+			&& response.data.length > 0 && typeof response.data[0] == 'string') {
+			this.records = [];
+			this.columns = [];
+			// console.log(response.data);
+			forRange(response.data.length, i => {
+				if (response.data[i].startsWith("fk_")) {
+					this.columns[i] = response.data[i].slice(3);
+					this.foreignColumns.push(this.columns[i][0].toUpperCase() + this.columns[i].slice(1));
+				} else {
+					this.columns[i] = response.data[i];
+				}
+			});
+		} else {
+			if (findById) {
+				this.records = [];
+				this.records[0] = response.data;
+			} else {
+				this.records = response.data; //otrzymane rekordy
 			}
-		});
+			this.columns = Object.keys(this.records[0]); //nazwy kolumn }rekordĂłw
+
+			forRange(this.columns.length, i => {
+				var keys = Object.keys(this.records[0][this.columns[i]]);
+				if (keys.length > 0 && typeof this.records[0][this.columns[i]] != 'string') {
+					this.foreignColumns.push(this.columns[i][0].toUpperCase() + this.columns[i].slice(1));
+				}
+			});
+		}
 		this.rowCount = this.records.length;
 		this.columnCount = this.columns.length;
 
@@ -34,19 +50,19 @@ class VirtualTable {
 	setNewRecordAdded(value) { this.newRecordAdded = value; }
 	isNewRecordAdded() { return this.newRecordAdded; }
 
-	//na siłę wpisane pod konkretną bazę danych
+	//na siĹ‚Ä™ wpisane pod konkretnÄ… bazÄ™ danych
 	getInputType(column) {
 		switch (column) {
 			case "id": return "number";
 			case "dateOfRelease": return "date";
-			default: return "text"; //domyślnie tekst
+			default: return "text"; //domyĹ›lnie tekst
 		}
 	}
 
 	doesInputCorrect(column, value, isForeign) {
 		const datePattern = /\d{4}-\d{2}-\d{2}/;
 		switch (column) {
-			case "id": return true; //bowiem na siłę tam jest znak *
+			case "id": return true; //bowiem na siĹ‚Ä™ tam jest znak *
 			case "dateOfRelease": {
 				if (value == undefined)
 					return false;
@@ -60,7 +76,7 @@ class VirtualTable {
 		switch (column) {
 			case "id": return "_setNumber_";
 			case "dateOfRelease": return "_setDate_";
-			default: return "_setText_"; //domyślnie tekst
+			default: return "_setText_"; //domyĹ›lnie tekst
 		}
 	}
 
@@ -83,7 +99,7 @@ class VirtualTable {
 		return records;
 	}
 
-	//na sztywno wpisana nazwa kolumny z kluczem id (a może być inna)
+	//na sztywno wpisana nazwa kolumny z kluczem id (a moĹĽe byÄ‡ inna)
 	isIdColumn(column) { return column == "id"; }
 
 	getIndexOfForeignColumnIfExists(column) {
@@ -108,7 +124,11 @@ class VirtualTable {
 	}
 
 	addForeignRecordsForColumn(response, arrayIndex) {
-		this.foreignRecordsForEachForeignColumn[arrayIndex] = (response.data);
+		if (Array.isArray(response.data) && response.data.length > 0 && typeof response.data[0] == 'string') {
+
+		} else {
+			this.foreignRecordsForEachForeignColumn[arrayIndex] = (response.data);
+		}
 	}
 
 	getUpdatedRecord() {
@@ -119,8 +139,8 @@ class VirtualTable {
 		return (this.currentColumnIndex != -1) ? this.columns[this.currentColumnIndex] : "noColumnIsUpdated";
 	}
 
-	setUpdatedCellValue(value) {this.getUpdatedRecord()[this.getUpdatedColumnName()] = value;}
-	getUpdatedCellValue() {return this.getUpdatedRecord()[this.getUpdatedColumnName()];}
+	setUpdatedCellValue(value) { this.getUpdatedRecord()[this.getUpdatedColumnName()] = value; }
+	getUpdatedCellValue() { return this.getUpdatedRecord()[this.getUpdatedColumnName()]; }
 
 	removeUpdatingUIElement() {
 		if (this.currentRowIndex != -1 && this.currentColumnIndex != -1)
@@ -133,6 +153,13 @@ class VirtualTable {
 				alert("One is already updated! Update one first, then next one.");
 			return;
 		}
+
+		//na sztywno wpisana nazwa kolumny id
+		if(column=="id"){
+			alert("Primary key can't be updated. PK are assigned automatically by persitance provider!");
+			return;
+		}
+
 		forRange(this.rowCount, i => { if (this.recordsEquals(this.records[i], record)) this.currentRowIndex = i; });
 		forRange(this.columnCount, i => { if (this.columns[i] == column) this.currentColumnIndex = i; });
 		if (this.currentColumnIndex != -1 && this.currentRowIndex != -1);
