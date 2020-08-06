@@ -1,9 +1,13 @@
 package application.dao;
 
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -118,6 +122,4 @@ class DatabaseDaoTest {
 		//TODO 2 sty 2020:dodać testy nowej metody pobierającej nazwy kolumn tabeli. Jest to konieczne w przypadku, gdy baza danych jest pusta i
 		//nie wszystkie pola są inicjowane w JS w obiekcie VirtualTable
 	}
-	
-	
 }

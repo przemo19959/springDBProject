@@ -26,7 +26,7 @@ class VirtualTable {
 			} else {
 				this.records = response.data; //otrzymane rekordy
 			}
-			this.columns = Object.keys(this.records[0]); //nazwy kolumn }rekordĂłw
+			this.columns = Object.keys(this.records[0]); //nazwy kolumn }rekordów
 
 			forRange(this.columns.length, i => {
 				var keys = Object.keys(this.records[0][this.columns[i]]);

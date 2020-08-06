@@ -1,6 +1,6 @@
-var myApp = angular.module('myApp', []); //utworzenie moduĹ‚u o danej nazwie
+var myApp = angular.module('myApp', []); //utworzenie modułu o danej nazwie
 
-//staĹ‚e
+//stałe
 const mainURL = "http://localhost:8080/springDBProject/mainPage/";
 const ENTER_KEYCODE = 13;
 const ESC_KEYCODE = 27;
@@ -23,8 +23,8 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 		{ name: "gry konsolowe", value: "ConsoleGame" },
 		{ name: "tryby gry", value: "GameplayMode" },
 		{ name: "gatunki", value: "Genre" },
-		{ name: "platformy sprzÄ™towe", value: "HardwarePlatform" },
-		{ name: "jÄ™zyki", value: "Language" },
+		{ name: "platformy sprzętowe", value: "HardwarePlatform" },
+		{ name: "języki", value: "Language" },
 		{ name: "producenci", value: "Producer" },
 		{ name: "wydawcy", value: "Publisher" }
 	];
@@ -38,7 +38,7 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 		var keys = Object.keys(obj);
 		if (keys.length > 0 && typeof obj != 'string') {
 			var result = [];
-			//i>0 pomiĹ„ kolumnÄ™ z id
+			//i>0 pomiń kolumnę z id
 			forRange(keys.length, i => { if (i > 0 && keys[i] != "$$hashKey") result.push(obj[keys[i]]); });
 			return result.join(", ");
 		}
@@ -155,7 +155,7 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 	}
 
 	//C-Create-save
-	//inicjowane wartoĹ›ciami dla kolumny id o wymuszonej zawartoĹ›ci *
+	//inicjowane wartościami dla kolumny id o wymuszonej zawartości *
 	$scope.recordSB = { id: "*" };
 	$scope.recordSBStyle = ["correct"];
 
@@ -168,9 +168,9 @@ myApp.controller('myAppController', ['$scope', '$http', function ($scope, $http)
 		}
 		if ($scope.tableCBox != $scope.tables[0]) {
 			forRange($scope.virtualTab.columnCount, i => {
-				if (i > 0) {	//pomijamy kolumnÄ™ id => wymuszono correct
+				if (i > 0) {	//pomijamy kolumnę id => wymuszono correct
 					if ($scope.virtualTab.columns[i] == "dateOfRelease") {
-						//poczÄ…tkowa inicjalizacja aktualnÄ… datÄ…
+						//początkowa inicjalizacja aktualną datą
 						$scope.recordSB["dateOfRelease"] = new Date();
 						$scope.recordSBStyle[i] = "correct";
 					} else
@@ -277,7 +277,7 @@ const getFormattedCopyOf = function (item, itemColumns) {
 	return recordToSave;
 }
 
-//zwrĂłc datÄ™ w formacie yyyy-mm-dd z obiektu Date
+//zwróc datę w formacie yyyy-mm-dd z obiektu Date
 const getFormatedDateIfDateObject = function (value) {
 	if (value instanceof Date) {
 		var monthNumber = value.getMonth() + 1;
