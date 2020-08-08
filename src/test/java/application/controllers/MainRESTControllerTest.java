@@ -1,25 +1,18 @@
 package application.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-
-import javax.persistence.OptimisticLockException;
-import javax.servlet.ServletContext;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
+import application.configs.root.CommonConfig;
+import application.configs.root.ProdConfig;
+import application.configs.root.TestConfig;
+import application.configs.web.WebConfig;
+import application.dao.Dao;
+import application.services.DaoService;
+import application.services.exceptions.ConstraintException;
+import application.services.exceptions.NoSuchRecord;
+import application.services.exceptions.TableNameRequestBodyException;
+import application.services.exceptions.WrongTableNameException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -31,20 +24,18 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import pl.dabrowski.GameShop.entities.Genre;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.persistence.OptimisticLockException;
+import javax.servlet.ServletContext;
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
-import application.configs.root.CommonConfig;
-import application.configs.root.ProdConfig;
-import application.configs.root.TestConfig;
-import application.configs.web.WebConfig;
-import application.dao.Dao;
-import application.entities.Genre;
-import application.services.DaoService;
-import application.services.exceptions.ConstraintException;
-import application.services.exceptions.NoSuchRecord;
-import application.services.exceptions.TableNameRequestBodyException;
-import application.services.exceptions.WrongTableNameException;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = { WebConfig.class, CommonConfig.class, ProdConfig.class, TestConfig.class })
