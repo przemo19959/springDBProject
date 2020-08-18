@@ -1,42 +1,49 @@
 package pl.dabrowski.GameShop.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.RepositoryRestController;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import pl.dabrowski.GameShop.entities.AgeCategory;
-import pl.dabrowski.GameShop.entities.GameplayMode;
-import pl.dabrowski.GameShop.repositories.AgeCategoryRepository;
+import org.springframework.web.bind.annotation.RestController;
+import pl.dabrowski.GameShop.assemblers.GameplayModeAssembler;
 import pl.dabrowski.GameShop.repositories.GameplayModeRepository;
-import pl.dabrowski.GameShop.repositories.custom.KeyDTO;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import java.util.NoSuchElementException;
 
-@RepositoryRestController
+@RestController
 @RequestMapping(GameplayModeController.BASE_URL)
 public class GameplayModeController {
     final static String BASE_URL = "/gameplayModes";
     private final GameplayModeRepository gameplayModeRepository;
+    private final GameplayModeAssembler gameplayModeAssembler;
 
     @Autowired
-    public GameplayModeController(GameplayModeRepository myRepository) {
+    public GameplayModeController(GameplayModeRepository myRepository, GameplayModeAssembler gameplayModeAssembler) {
         this.gameplayModeRepository = myRepository;
+        this.gameplayModeAssembler = gameplayModeAssembler;
     }
 
-    @GetMapping("/search")
-    @ResponseBody
-    public ResponseEntity<?> search() {
-        return ResponseEntity.ok(EntityModel.of("",
-                linkTo(methodOn(GameplayModeController.class).findKeys()).withRel("keys")));
+    @GetMapping
+    public ResponseEntity<?> findAll() {
+        return ResponseEntity.ok(gameplayModeAssembler.toCollectionModel(gameplayModeRepository.findAll()));
     }
 
-    @GetMapping("/search/findKeys")
-    @ResponseBody
-    public ResponseEntity<Iterable<KeyDTO>> findKeys() {
-        return ResponseEntity.ok(gameplayModeRepository.findKeys(GameplayMode.class));
+    @GetMapping("/{id}")
+    public ResponseEntity<?> findById(@PathVariable int id) {
+        return ResponseEntity.ok(gameplayModeAssembler.toModel(gameplayModeRepository.findById(id).orElseThrow(NoSuchElementException::new)));
     }
+//
+//    @GetMapping("/search")
+//    @ResponseBody
+//    public ResponseEntity<?> search() {
+//        return ResponseEntity.ok(EntityModel.of("",
+//                linkTo(methodOn(GameplayModeController.class).findKeys()).withRel("keys")));
+//    }
+//
+//    @GetMapping("/search/findKeys")
+//    @ResponseBody
+//    public ResponseEntity<Iterable<KeyDTO>> findKeys() {
+//        return ResponseEntity.ok(gameplayModeRepository.findKeys(GameplayMode.class));
+//    }
 }
