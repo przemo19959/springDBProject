@@ -1,12 +1,15 @@
 package pl.dabrowski.GameShop.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.dabrowski.GameShop.assemblers.AgeCategoryAssembler;
+import pl.dabrowski.GameShop.entities.AgeCategory;
 import pl.dabrowski.GameShop.repositories.AgeCategoryRepository;
 
 import java.util.NoSuchElementException;
@@ -25,26 +28,13 @@ public class AgeCategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<?> findAll() {
+    public ResponseEntity<CollectionModel<EntityModel<AgeCategory>>> findAll() {
         return ResponseEntity.ok(ageCategoryAssembler.toCollectionModel(ageCategoryRepository.findAll()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable int id) {
-        return ResponseEntity.ok(ageCategoryAssembler.toModel(ageCategoryRepository.findById(id).orElseThrow(NoSuchElementException::new)));
+    public ResponseEntity<EntityModel<AgeCategory>> findById(@PathVariable int id) {
+        return ResponseEntity.ok(ageCategoryAssembler.toModel(ageCategoryRepository.findById(id)//
+        		.orElseThrow(NoSuchElementException::new)));
     }
-
-//
-//    @GetMapping("/search")
-//    @ResponseBody
-//    public ResponseEntity<?> search() {
-//        return ResponseEntity.ok(EntityModel.of("",
-//                linkTo(methodOn(AgeCategoryController.class).findKeys()).withRel("keys")));
-//    }
-//
-//    @GetMapping("/search/findKeys")
-//    @ResponseBody
-//    public ResponseEntity<Iterable<KeyDTO>> findKeys() {
-//        return ResponseEntity.ok(ageCategoryRepository.findKeys(AgeCategory.class));
-//    }
 }

@@ -4,7 +4,6 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
-import pl.dabrowski.GameShop.controllers.ConsoleGameController;
 import pl.dabrowski.GameShop.controllers.HardwarePlatformController;
 import pl.dabrowski.GameShop.entities.HardwarePlatform;
 

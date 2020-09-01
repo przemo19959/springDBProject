@@ -1,12 +1,12 @@
 package pl.dabrowski.GameShop.configs;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
-import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
-import org.springframework.stereotype.Component;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
+// import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
+// import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.metamodel.Type;
+// import javax.persistence.EntityManager;
+// import javax.persistence.metamodel.Type;
 
 //@Component
 //public class SpringDataRESTConfig implements RepositoryRestConfigurer {

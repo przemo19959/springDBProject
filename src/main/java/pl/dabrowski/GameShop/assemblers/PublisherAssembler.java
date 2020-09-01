@@ -15,17 +15,17 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
 public class PublisherAssembler implements RepresentationModelAssembler<Publisher, EntityModel<Publisher>> {
-    @Override
-    public EntityModel<Publisher> toModel(Publisher publisher) {
-        return EntityModel.of(publisher,
-                linkTo(methodOn(PublisherController.class).findById(publisher.getId())).withSelfRel());
-    }
+	@Override
+	public EntityModel<Publisher> toModel(Publisher publisher) {
+		return EntityModel.of(publisher,//
+				linkTo(methodOn(PublisherController.class).findById(publisher.getId())).withSelfRel());
+	}
 
-    @Override
-    public CollectionModel<EntityModel<Publisher>> toCollectionModel(Iterable<? extends Publisher> publishers) {
-        return CollectionModel.of(StreamSupport.stream(publishers.spliterator(), false)
-                        .map(this::toModel)
-                        .collect(Collectors.toList()),
-                linkTo(methodOn(PublisherController.class).findAll()).withSelfRel());
-    }
+	@Override
+	public CollectionModel<EntityModel<Publisher>> toCollectionModel(Iterable<? extends Publisher> publishers) {
+		return CollectionModel.of(StreamSupport.stream(publishers.spliterator(), false)//
+				.map(this::toModel)//
+				.collect(Collectors.toList()), //
+				linkTo(methodOn(PublisherController.class).findAll()).withSelfRel());
+	}
 }

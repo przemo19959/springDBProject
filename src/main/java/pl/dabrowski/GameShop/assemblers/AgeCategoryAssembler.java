@@ -5,7 +5,6 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 import pl.dabrowski.GameShop.controllers.AgeCategoryController;
-import pl.dabrowski.GameShop.controllers.ConsoleGameController;
 import pl.dabrowski.GameShop.entities.AgeCategory;
 
 import java.util.stream.Collectors;
