@@ -13,8 +13,6 @@ import pl.dabrowski.GameShop.assemblers.ConsoleGameAssembler;
 import pl.dabrowski.GameShop.entities.ConsoleGame;
 import pl.dabrowski.GameShop.repositories.ConsoleGameRepository;
 
-import java.util.NoSuchElementException;
-
 @RestController
 @RequestMapping(ConsoleGameController.BASE_URL)
 public class ConsoleGameController {
@@ -36,7 +34,6 @@ public class ConsoleGameController {
 
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<ConsoleGame>> findById(@PathVariable int id) {
-        return ResponseEntity.ok(consoleGameAssembler.toModel(consoleGameRepository.findById(id)//
-        		.orElseThrow(NoSuchElementException::new)));
+        return ResponseEntity.ok(consoleGameAssembler.toModel(consoleGameRepository.findById(id).get()));
     }
 }

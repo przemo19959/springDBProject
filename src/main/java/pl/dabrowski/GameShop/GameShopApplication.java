@@ -2,9 +2,10 @@ package pl.dabrowski.GameShop;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
-//@EnableJpaRepositories(repositoryBaseClass = MyRepositoryImpl.class)
+@PropertySource(value = "classpath:messages.properties")
 public class GameShopApplication {
     public static void main(String[] args) {
         SpringApplication.run(GameShopApplication.class, args);
