@@ -6,6 +6,8 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.dabrowski.GameShop.assemblers.AgeCategoryAssembler;
@@ -17,24 +19,36 @@ import java.util.NoSuchElementException;
 @RestController
 @RequestMapping(AgeCategoryController.BASE_URL)
 public class AgeCategoryController {
-    final static String BASE_URL = "/ageCategories";
-    private final AgeCategoryRepository ageCategoryRepository;
-    private final AgeCategoryAssembler ageCategoryAssembler;
+	final static String BASE_URL = "/ageCategories";
+	private final AgeCategoryRepository ageCategoryRepository;
+	private final AgeCategoryAssembler ageCategoryAssembler;
 
-    @Autowired
-    public AgeCategoryController(AgeCategoryRepository myRepository, AgeCategoryAssembler ageCategoryAssembler) {
-        this.ageCategoryRepository = myRepository;
-        this.ageCategoryAssembler = ageCategoryAssembler;
-    }
+	@Autowired
+	public AgeCategoryController(AgeCategoryRepository myRepository, AgeCategoryAssembler ageCategoryAssembler) {
+		this.ageCategoryRepository = myRepository;
+		this.ageCategoryAssembler = ageCategoryAssembler;
+	}
 
-    @GetMapping
-    public ResponseEntity<CollectionModel<EntityModel<AgeCategory>>> findAll() {
-        return ResponseEntity.ok(ageCategoryAssembler.toCollectionModel(ageCategoryRepository.findAll()));
-    }
+	@GetMapping
+	public ResponseEntity<CollectionModel<EntityModel<AgeCategory>>> findAll() {
+		return ResponseEntity.ok(ageCategoryAssembler.toCollectionModel(ageCategoryRepository.findAll()));
+	}
 
-    @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<AgeCategory>> findById(@PathVariable int id) {
-        return ResponseEntity.ok(ageCategoryAssembler.toModel(ageCategoryRepository.findById(id)//
-        		.orElseThrow(NoSuchElementException::new)));
-    }
+	@GetMapping("/{id}")
+	public ResponseEntity<EntityModel<AgeCategory>> findById(@PathVariable int id) {
+		return ResponseEntity.ok(ageCategoryAssembler.toModel(ageCategoryRepository.findById(id)//
+				.orElseThrow(NoSuchElementException::new)));
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<EntityModel<AgeCategory>> update(@RequestBody AgeCategory newAgeCategory,
+			@PathVariable int id) {
+		return ResponseEntity.ok(ageCategoryRepository.findById(id).map(ageCategory -> {
+			ageCategory.setName(newAgeCategory.getName());
+			return ageCategoryAssembler.toModel(ageCategoryRepository.save(ageCategory));
+		}).orElseGet(() -> {
+			newAgeCategory.setId(id);
+			return ageCategoryAssembler.toModel(ageCategoryRepository.save(newAgeCategory));
+		}));
+	}
 }

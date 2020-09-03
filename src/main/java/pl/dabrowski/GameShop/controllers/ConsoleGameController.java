@@ -6,6 +6,8 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,24 +18,44 @@ import pl.dabrowski.GameShop.repositories.ConsoleGameRepository;
 @RestController
 @RequestMapping(ConsoleGameController.BASE_URL)
 public class ConsoleGameController {
-    final static String BASE_URL = "/consoleGames";
+	final static String BASE_URL = "/consoleGames";
 
-    private final ConsoleGameRepository consoleGameRepository;
-    private final ConsoleGameAssembler consoleGameAssembler;
+	private final ConsoleGameRepository consoleGameRepository;
+	private final ConsoleGameAssembler consoleGameAssembler;
 
-    @Autowired
-    public ConsoleGameController(ConsoleGameRepository myRepository, ConsoleGameAssembler consoleGameAssembler) {
-        this.consoleGameRepository = myRepository;
-        this.consoleGameAssembler = consoleGameAssembler;
-    }
+	@Autowired
+	public ConsoleGameController(ConsoleGameRepository myRepository, ConsoleGameAssembler consoleGameAssembler) {
+		this.consoleGameRepository = myRepository;
+		this.consoleGameAssembler = consoleGameAssembler;
+	}
 
-    @GetMapping
-    public ResponseEntity<CollectionModel<EntityModel<ConsoleGame>>> findAll() {
-        return ResponseEntity.ok(consoleGameAssembler.toCollectionModel(consoleGameRepository.findAll()));
-    }
+	@GetMapping
+	public ResponseEntity<CollectionModel<EntityModel<ConsoleGame>>> findAll() {
+		return ResponseEntity.ok(consoleGameAssembler.toCollectionModel(consoleGameRepository.findAll()));
+	}
 
-    @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<ConsoleGame>> findById(@PathVariable int id) {
-        return ResponseEntity.ok(consoleGameAssembler.toModel(consoleGameRepository.findById(id).get()));
-    }
+	@GetMapping("/{id}")
+	public ResponseEntity<EntityModel<ConsoleGame>> findById(@PathVariable int id) {
+		return ResponseEntity.ok(consoleGameAssembler.toModel(consoleGameRepository.findById(id).get()));
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<EntityModel<ConsoleGame>> update(@RequestBody ConsoleGame newConsoleGame,
+			@PathVariable int id) {
+		return ResponseEntity.ok(consoleGameRepository.findById(id).map(consoleGame -> {
+			consoleGame.setTitle(newConsoleGame.getTitle());
+			consoleGame.setDateOfRelease(newConsoleGame.getDateOfRelease());
+			consoleGame.setAgeCategory(newConsoleGame.getAgeCategory());
+			consoleGame.setGameplayMode(newConsoleGame.getGameplayMode());
+			consoleGame.setGenre(newConsoleGame.getGenre());
+			consoleGame.setHardwarePlatform(newConsoleGame.getHardwarePlatform());
+			consoleGame.setProducer(newConsoleGame.getProducer());
+			consoleGame.setPublisher(newConsoleGame.getPublisher());
+			consoleGame.setLanguage(newConsoleGame.getLanguage());
+			return consoleGameAssembler.toModel(consoleGameRepository.save(consoleGame));
+		}).orElseGet(() -> {
+			newConsoleGame.setId(id);
+			return consoleGameAssembler.toModel(consoleGameRepository.save(newConsoleGame));
+		}));
+	}
 }

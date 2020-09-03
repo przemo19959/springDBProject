@@ -6,6 +6,8 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.dabrowski.GameShop.assemblers.PublisherAssembler;
@@ -36,5 +38,16 @@ public class PublisherController {
 	public ResponseEntity<EntityModel<Publisher>> findById(@PathVariable int id) {
 		return ResponseEntity.ok(publisherAssembler.toModel(publisherRepository.findById(id)//
 				.orElseThrow(NoSuchElementException::new)));
+	}
+
+	@PutMapping(value = "{/id}")
+	public ResponseEntity<EntityModel<Publisher>> update(@RequestBody Publisher newPublisher, @PathVariable int id) {
+		return ResponseEntity.ok(publisherRepository.findById(id).map(language -> {
+			language.setName(newPublisher.getName());
+			return publisherAssembler.toModel(publisherRepository.save(language));
+		}).orElseGet(() -> {
+			newPublisher.setId(id);
+			return publisherAssembler.toModel(publisherRepository.save(newPublisher));
+		}));
 	}
 }

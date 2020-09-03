@@ -6,6 +6,8 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.dabrowski.GameShop.assemblers.ProducerAssembler;
@@ -36,5 +38,16 @@ public class ProducerController {
 	public ResponseEntity<EntityModel<Producer>> findById(@PathVariable int id) {
 		return ResponseEntity.ok(producerAssembler.toModel(producerRepository.findById(id)//
 				.orElseThrow(NoSuchElementException::new)));
+	}
+	
+	@PutMapping("/{id}")
+	public ResponseEntity<EntityModel<Producer>> update(@RequestBody Producer newProducer, @PathVariable int id) {
+		return ResponseEntity.ok(producerRepository.findById(id).map(producer -> {
+			producer.setName(newProducer.getName());
+			return producerAssembler.toModel(producerRepository.save(producer));
+		}).orElseGet(() -> {
+			newProducer.setId(id);
+			return producerAssembler.toModel(producerRepository.save(newProducer));
+		}));
 	}
 }

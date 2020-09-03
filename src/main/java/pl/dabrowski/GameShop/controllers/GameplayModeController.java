@@ -6,6 +6,8 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.dabrowski.GameShop.assemblers.GameplayModeAssembler;
@@ -36,5 +38,17 @@ public class GameplayModeController {
 	public ResponseEntity<EntityModel<GameplayMode>> findById(@PathVariable int id) {
 		return ResponseEntity.ok(gameplayModeAssembler.toModel(gameplayModeRepository.findById(id)//
 				.orElseThrow(NoSuchElementException::new)));
+	}
+	
+	@PutMapping("/{id}")
+	public ResponseEntity<EntityModel<GameplayMode>> update(@RequestBody GameplayMode newGameplayMode,
+			@PathVariable int id) {
+		return ResponseEntity.ok(gameplayModeRepository.findById(id).map(gameplayMode -> {
+			gameplayMode.setName(newGameplayMode.getName());
+			return gameplayModeAssembler.toModel(gameplayModeRepository.save(gameplayMode));
+		}).orElseGet(() -> {
+			newGameplayMode.setId(id);
+			return gameplayModeAssembler.toModel(gameplayModeRepository.save(newGameplayMode));
+		}));
 	}
 }

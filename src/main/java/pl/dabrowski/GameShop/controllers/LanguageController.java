@@ -6,6 +6,8 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.dabrowski.GameShop.assemblers.LanguageAssembler;
@@ -36,5 +38,16 @@ public class LanguageController {
 	public ResponseEntity<EntityModel<Language>> findById(@PathVariable int id) {
 		return ResponseEntity.ok(languageAssembler.toModel(languageRepository.findById(id)//
 				.orElseThrow(NoSuchElementException::new)));
+	}
+	
+	@PutMapping("/{id}")
+	public ResponseEntity<EntityModel<Language>> update(@RequestBody Language newLanguage, @PathVariable int id) {
+		return ResponseEntity.ok(languageRepository.findById(id).map(language -> {
+			language.setName(newLanguage.getName());
+			return languageAssembler.toModel(languageRepository.save(language));
+		}).orElseGet(() -> {
+			newLanguage.setId(id);
+			return languageAssembler.toModel(languageRepository.save(newLanguage));
+		}));
 	}
 }

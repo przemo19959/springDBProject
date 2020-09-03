@@ -6,6 +6,8 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.dabrowski.GameShop.assemblers.GenreAssembler;
@@ -36,5 +38,16 @@ public class GenreController {
 	public ResponseEntity<EntityModel<Genre>> findById(@PathVariable int id) {
 		return ResponseEntity.ok(genreAssembler.toModel(genreRepository.findById(id)//
 				.orElseThrow(NoSuchElementException::new)));
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<EntityModel<Genre>> update(@RequestBody Genre newGenre, @PathVariable int id) {
+		return ResponseEntity.ok(genreRepository.findById(id).map(genre -> {
+			genre.setName(newGenre.getName());
+			return genreAssembler.toModel(genreRepository.save(genre));
+		}).orElseGet(() -> {
+			newGenre.setId(id);
+			return genreAssembler.toModel(genreRepository.save(newGenre));
+		}));
 	}
 }

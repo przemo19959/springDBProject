@@ -6,6 +6,8 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.dabrowski.GameShop.assemblers.HardwarePlatformAssembler;
@@ -37,5 +39,16 @@ public class HardwarePlatformController {
 	public ResponseEntity<EntityModel<HardwarePlatform>> findById(@PathVariable int id) {
 		return ResponseEntity.ok(hardwarePlatformAssembler.toModel(hardwarePlatformRepository.findById(id)//
 				.orElseThrow(NoSuchElementException::new)));
+	}
+	
+	@PutMapping("/{id}")
+	public ResponseEntity<EntityModel<HardwarePlatform>> update(@RequestBody HardwarePlatform newHardwarePlatform, @PathVariable int id) {
+		return ResponseEntity.ok(hardwarePlatformRepository.findById(id).map(hardwarePlatform -> {
+			hardwarePlatform.setName(newHardwarePlatform.getName());
+			return hardwarePlatformAssembler.toModel(hardwarePlatformRepository.save(hardwarePlatform));
+		}).orElseGet(() -> {
+			newHardwarePlatform.setId(id);
+			return hardwarePlatformAssembler.toModel(hardwarePlatformRepository.save(newHardwarePlatform));
+		}));
 	}
 }
