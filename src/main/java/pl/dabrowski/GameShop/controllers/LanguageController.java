@@ -22,6 +22,13 @@ public class LanguageController {
 	final static String BASE_URL = "/languages";
 	private final LanguageRepository languageRepository;
 	private final LanguageAssembler languageAssembler;
+	
+	public static final Language EXAMPLE;
+	static {
+		EXAMPLE=new Language();
+		EXAMPLE.setName("fill me");
+		EXAMPLE.setShortcut("fill me");
+	}
 
 	@Autowired
 	public LanguageController(LanguageRepository languageRepository, LanguageAssembler languageAssembler) {
@@ -49,5 +56,10 @@ public class LanguageController {
 			newLanguage.setId(id);
 			return languageAssembler.toModel(languageRepository.save(newLanguage));
 		}));
+	}
+	
+	@GetMapping("/example")
+	public ResponseEntity<EntityModel<Language>> example(){
+		return ResponseEntity.ok(languageAssembler.toModel(EXAMPLE));
 	}
 }

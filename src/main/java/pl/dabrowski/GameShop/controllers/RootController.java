@@ -1,6 +1,5 @@
 package pl.dabrowski.GameShop.controllers;
 
-import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,10 +7,12 @@ import org.springframework.web.bind.annotation.RestController;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import org.springframework.hateoas.EntityModel;
+
 @RestController("/")
 public class RootController {
     @GetMapping
-    public ResponseEntity<EntityModel<String>> getRestAPIroot() {
+    public ResponseEntity<EntityModel<String>> getRestAPIroot() {    	
         return ResponseEntity.ok(EntityModel.of("",
                 linkTo(methodOn(ConsoleGameController.class).findAll()).withRel("consoleGames"),
                 linkTo(methodOn(AgeCategoryController.class).findAll()).withRel("ageCategories"),

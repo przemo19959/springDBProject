@@ -22,6 +22,12 @@ public class AgeCategoryController {
 	final static String BASE_URL = "/ageCategories";
 	private final AgeCategoryRepository ageCategoryRepository;
 	private final AgeCategoryAssembler ageCategoryAssembler;
+	
+	public static final AgeCategory EXAMPLE;
+	static {
+		EXAMPLE=new AgeCategory();
+		EXAMPLE.setName("fill me");
+	}
 
 	@Autowired
 	public AgeCategoryController(AgeCategoryRepository myRepository, AgeCategoryAssembler ageCategoryAssembler) {
@@ -50,5 +56,10 @@ public class AgeCategoryController {
 			newAgeCategory.setId(id);
 			return ageCategoryAssembler.toModel(ageCategoryRepository.save(newAgeCategory));
 		}));
+	}
+	
+	@GetMapping("/example")
+	public ResponseEntity<EntityModel<AgeCategory>> example(){
+		return ResponseEntity.ok(ageCategoryAssembler.toModel(EXAMPLE));
 	}
 }

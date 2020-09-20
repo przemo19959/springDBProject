@@ -22,7 +22,13 @@ public class GenreController {
 	final static String BASE_URL = "/genres";
 	private final GenreRepository genreRepository;
 	private final GenreAssembler genreAssembler;
-
+	
+	public static final Genre EXAMPLE;
+	static {
+		EXAMPLE=new Genre();
+		EXAMPLE.setName("fill me");
+	}
+ 	
 	@Autowired
 	public GenreController(GenreRepository myRepository, GenreAssembler genreAssembler) {
 		this.genreRepository = myRepository;
@@ -49,5 +55,10 @@ public class GenreController {
 			newGenre.setId(id);
 			return genreAssembler.toModel(genreRepository.save(newGenre));
 		}));
+	}
+	
+	@GetMapping("/example")
+	public ResponseEntity<EntityModel<Genre>> example(){
+		return ResponseEntity.ok(genreAssembler.toModel(EXAMPLE));
 	}
 }

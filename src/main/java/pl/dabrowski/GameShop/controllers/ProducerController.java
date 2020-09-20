@@ -22,6 +22,12 @@ public class ProducerController {
 	final static String BASE_URL = "/producers";
 	private final ProducerRepository producerRepository;
 	private final ProducerAssembler producerAssembler;
+	
+	public static final Producer EXAMPLE;
+	static {
+		EXAMPLE=new Producer();
+		EXAMPLE.setName("fill me");
+	}
 
 	@Autowired
 	public ProducerController(ProducerRepository producerRepository, ProducerAssembler producerAssembler) {
@@ -49,5 +55,10 @@ public class ProducerController {
 			newProducer.setId(id);
 			return producerAssembler.toModel(producerRepository.save(newProducer));
 		}));
+	}
+	
+	@GetMapping("/example")
+	public ResponseEntity<EntityModel<Producer>> example(){
+		return ResponseEntity.ok(producerAssembler.toModel(EXAMPLE));
 	}
 }

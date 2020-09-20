@@ -29,7 +29,3 @@ VALUES (1, 'singleplayer'),
 insert into wydawcy (id, nazwa)
 VALUES (1, 'Radical Entertainment'),
        (2, 'Nvidia');
-
-INSERT INTO gry_konsolowe (data_wydania, tytul, fk_kategoria_wiekowa, fk_tryb_gry, fk_gatunek, fk_platforma_sprzetowa,
-                           fk_jezyk, fk_producent, fk_wydawca)
-VALUES ('2000-2-3', 'Max Payne 2', 3, 1, 1, 1, 2, 1, 1);

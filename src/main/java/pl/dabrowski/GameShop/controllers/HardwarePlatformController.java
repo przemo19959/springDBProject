@@ -22,7 +22,14 @@ public class HardwarePlatformController {
 	final static String BASE_URL = "/hardwarePlatforms";
 	private final HardwarePlatformRepository hardwarePlatformRepository;
 	private final HardwarePlatformAssembler hardwarePlatformAssembler;
-
+	
+	public static final HardwarePlatform EXAMPLE;
+	static {
+		EXAMPLE=new HardwarePlatform();
+		EXAMPLE.setName("fill me");
+		EXAMPLE.setShortcut("fill me");
+	}
+	
 	@Autowired
 	public HardwarePlatformController(HardwarePlatformRepository hardwarePlatformRepository,
 			HardwarePlatformAssembler hardwarePlatformAssembler) {
@@ -50,5 +57,10 @@ public class HardwarePlatformController {
 			newHardwarePlatform.setId(id);
 			return hardwarePlatformAssembler.toModel(hardwarePlatformRepository.save(newHardwarePlatform));
 		}));
+	}
+	
+	@GetMapping("/example")
+	public ResponseEntity<EntityModel<HardwarePlatform>> example(){
+		return ResponseEntity.ok(hardwarePlatformAssembler.toModel(EXAMPLE));
 	}
 }

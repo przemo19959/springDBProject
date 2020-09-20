@@ -1,5 +1,7 @@
 package pl.dabrowski.GameShop.controllers;
 
+import java.util.NoSuchElementException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -10,11 +12,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import pl.dabrowski.GameShop.assemblers.PublisherAssembler;
 import pl.dabrowski.GameShop.entities.Publisher;
 import pl.dabrowski.GameShop.repositories.PublisherRepository;
-
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping(PublisherController.BASE_URL)
@@ -22,6 +23,12 @@ public class PublisherController {
 	final static String BASE_URL = "/publishers";
 	private final PublisherRepository publisherRepository;
 	private final PublisherAssembler publisherAssembler;
+	
+	public static final Publisher EXAMPLE;
+	static {
+		EXAMPLE=new Publisher();
+		EXAMPLE.setName("fill me");
+	}
 
 	@Autowired
 	public PublisherController(PublisherRepository publisherRepository, PublisherAssembler publisherAssembler) {
@@ -49,5 +56,10 @@ public class PublisherController {
 			newPublisher.setId(id);
 			return publisherAssembler.toModel(publisherRepository.save(newPublisher));
 		}));
+	}
+	
+	@GetMapping("/example")
+	public ResponseEntity<EntityModel<Publisher>> example(){
+		return ResponseEntity.ok(publisherAssembler.toModel(EXAMPLE));
 	}
 }

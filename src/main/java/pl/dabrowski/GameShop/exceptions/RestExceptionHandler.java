@@ -2,6 +2,7 @@ package pl.dabrowski.GameShop.exceptions;
 
 import java.util.NoSuchElementException;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -17,5 +18,10 @@ public class RestExceptionHandler {
 	@ExceptionHandler(value = NoSuchElementException.class)
 	public ResponseEntity<ExceptionDTO> handleNoSuchElementException() {
 		return new ResponseEntity<ExceptionDTO>(ExceptionDTO.create(NoSuchElementException.class, env), HttpStatus.NOT_FOUND);
+	}
+	
+	@ExceptionHandler(value = ConstraintViolationException.class)
+	public ResponseEntity<ExceptionDTO> handleConstraintViolationException() {
+		return new ResponseEntity<ExceptionDTO>(ExceptionDTO.create(ConstraintViolationException.class, env), HttpStatus.FORBIDDEN);
 	}
 }

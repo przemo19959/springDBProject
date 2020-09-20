@@ -17,8 +17,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class ConsoleGameAssembler implements RepresentationModelAssembler<ConsoleGame, EntityModel<ConsoleGame>> {
 	@Override
 	public EntityModel<ConsoleGame> toModel(final ConsoleGame consoleGame) {
-		return EntityModel.of(consoleGame,
+		return EntityModel.of(consoleGame, //
 				linkTo(methodOn(ConsoleGameController.class).findById(consoleGame.getId())).withSelfRel(),
+				linkTo(methodOn(ConsoleGameController.class).findAll()).withRel("all"),
+				//
+				//
 				linkTo(methodOn(PublisherController.class).findById(consoleGame.getPublisher().getId()))
 						.withRel("publisher"),
 				linkTo(methodOn(AgeCategoryController.class).findById(consoleGame.getAgeCategory().getId()))
@@ -39,6 +42,7 @@ public class ConsoleGameAssembler implements RepresentationModelAssembler<Consol
 			final Iterable<? extends ConsoleGame> consoleGames) {
 		return CollectionModel.of(
 				StreamSupport.stream(consoleGames.spliterator(), false).map(this::toModel).collect(Collectors.toList()),
-				linkTo(methodOn(ConsoleGameController.class).findAll()).withSelfRel());
+				linkTo(methodOn(ConsoleGameController.class).findAll()).withSelfRel(),
+				linkTo(methodOn(ConsoleGameController.class).example()).withRel("example"));
 	}
 }

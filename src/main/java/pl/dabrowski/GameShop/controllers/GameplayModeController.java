@@ -22,6 +22,12 @@ public class GameplayModeController {
 	final static String BASE_URL = "/gameplayModes";
 	private final GameplayModeRepository gameplayModeRepository;
 	private final GameplayModeAssembler gameplayModeAssembler;
+	
+	public static final GameplayMode EXAMPLE;
+	static {
+		EXAMPLE=new GameplayMode();
+		EXAMPLE.setName("fill me");
+	}
 
 	@Autowired
 	public GameplayModeController(GameplayModeRepository myRepository, GameplayModeAssembler gameplayModeAssembler) {
@@ -50,5 +56,10 @@ public class GameplayModeController {
 			newGameplayMode.setId(id);
 			return gameplayModeAssembler.toModel(gameplayModeRepository.save(newGameplayMode));
 		}));
+	}
+	
+	@GetMapping("/example")
+	public ResponseEntity<EntityModel<GameplayMode>> example(){
+		return ResponseEntity.ok(gameplayModeAssembler.toModel(EXAMPLE));
 	}
 }

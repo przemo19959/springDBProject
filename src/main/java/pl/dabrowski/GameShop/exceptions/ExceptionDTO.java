@@ -8,6 +8,7 @@ import lombok.Getter;
 
 @Getter
 public class ExceptionDTO {
+	private static final String SEPARATOR = ":::";
 	private static final String SOLUTIONS = "{0}.solutions";
 	private static final String MESSAGE = "{0}.message";
 
@@ -25,6 +26,6 @@ public class ExceptionDTO {
 		String exceptionName = ex.getSimpleName();
 		return new ExceptionDTO(exceptionName, //
 				env.getProperty(MessageFormat.format(MESSAGE, exceptionName)), //
-				env.getProperty(MessageFormat.format(SOLUTIONS, exceptionName)).split(","));
+				env.getProperty(MessageFormat.format(SOLUTIONS, exceptionName)).split(SEPARATOR));
 	}
 }
