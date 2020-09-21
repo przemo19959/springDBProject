@@ -1,5 +1,7 @@
 package pl.dabrowski.GameShop.controllers;
 
+import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_VALUE;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -30,7 +32,7 @@ public class ConsoleGameController {
 	
 	static {
 		EXAMPLE=new ConsoleGame();
-		EXAMPLE.setTitle("fill me");
+		EXAMPLE.setTitle(DEFAULT_EXAMPLE_VALUE);
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 		String dateInString = "2000-01-01";
 		try {

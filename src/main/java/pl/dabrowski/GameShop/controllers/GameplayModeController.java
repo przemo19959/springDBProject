@@ -14,6 +14,8 @@ import pl.dabrowski.GameShop.assemblers.GameplayModeAssembler;
 import pl.dabrowski.GameShop.entities.GameplayMode;
 import pl.dabrowski.GameShop.repositories.GameplayModeRepository;
 
+import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_VALUE;
+
 import java.util.NoSuchElementException;
 
 @RestController
@@ -26,7 +28,7 @@ public class GameplayModeController {
 	public static final GameplayMode EXAMPLE;
 	static {
 		EXAMPLE=new GameplayMode();
-		EXAMPLE.setName("fill me");
+		EXAMPLE.setName(DEFAULT_EXAMPLE_VALUE);
 	}
 
 	@Autowired

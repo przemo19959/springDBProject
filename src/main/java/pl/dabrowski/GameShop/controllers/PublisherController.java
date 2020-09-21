@@ -1,5 +1,7 @@
 package pl.dabrowski.GameShop.controllers;
 
+import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_VALUE;
+
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,7 @@ public class PublisherController {
 	public static final Publisher EXAMPLE;
 	static {
 		EXAMPLE=new Publisher();
-		EXAMPLE.setName("fill me");
+		EXAMPLE.setName(DEFAULT_EXAMPLE_VALUE);
 	}
 
 	@Autowired

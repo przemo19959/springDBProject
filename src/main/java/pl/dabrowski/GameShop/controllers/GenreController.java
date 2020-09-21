@@ -3,9 +3,11 @@ package pl.dabrowski.GameShop.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.dabrowski.GameShop.assemblers.GenreAssembler;
 import pl.dabrowski.GameShop.entities.Genre;
 import pl.dabrowski.GameShop.repositories.GenreRepository;
+
+import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_VALUE;
 
 import java.util.NoSuchElementException;
 
@@ -26,7 +30,7 @@ public class GenreController {
 	public static final Genre EXAMPLE;
 	static {
 		EXAMPLE=new Genre();
-		EXAMPLE.setName("fill me");
+		EXAMPLE.setName(DEFAULT_EXAMPLE_VALUE);
 	}
  	
 	@Autowired
@@ -55,6 +59,11 @@ public class GenreController {
 			newGenre.setId(id);
 			return genreAssembler.toModel(genreRepository.save(newGenre));
 		}));
+	}
+	
+	@PostMapping
+	public ResponseEntity<EntityModel<Genre>> save(@RequestBody Genre newGenre){
+		return new ResponseEntity<>(genreAssembler.toModel(genreRepository.save(newGenre)), HttpStatus.CREATED); 
 	}
 	
 	@GetMapping("/example")

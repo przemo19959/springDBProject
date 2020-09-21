@@ -14,6 +14,8 @@ import pl.dabrowski.GameShop.assemblers.ProducerAssembler;
 import pl.dabrowski.GameShop.entities.Producer;
 import pl.dabrowski.GameShop.repositories.ProducerRepository;
 
+import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_VALUE;
+
 import java.util.NoSuchElementException;
 
 @RestController
@@ -26,7 +28,7 @@ public class ProducerController {
 	public static final Producer EXAMPLE;
 	static {
 		EXAMPLE=new Producer();
-		EXAMPLE.setName("fill me");
+		EXAMPLE.setName(DEFAULT_EXAMPLE_VALUE);
 	}
 
 	@Autowired

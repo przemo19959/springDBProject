@@ -14,6 +14,8 @@ import pl.dabrowski.GameShop.assemblers.LanguageAssembler;
 import pl.dabrowski.GameShop.entities.Language;
 import pl.dabrowski.GameShop.repositories.LanguageRepository;
 
+import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_VALUE;
+
 import java.util.NoSuchElementException;
 
 @RestController
@@ -26,8 +28,8 @@ public class LanguageController {
 	public static final Language EXAMPLE;
 	static {
 		EXAMPLE=new Language();
-		EXAMPLE.setName("fill me");
-		EXAMPLE.setShortcut("fill me");
+		EXAMPLE.setName(DEFAULT_EXAMPLE_VALUE);
+		EXAMPLE.setShortcut(DEFAULT_EXAMPLE_VALUE);
 	}
 
 	@Autowired

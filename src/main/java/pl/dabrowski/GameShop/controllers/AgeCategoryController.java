@@ -14,6 +14,8 @@ import pl.dabrowski.GameShop.assemblers.AgeCategoryAssembler;
 import pl.dabrowski.GameShop.entities.AgeCategory;
 import pl.dabrowski.GameShop.repositories.AgeCategoryRepository;
 
+import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_VALUE;
+
 import java.util.NoSuchElementException;
 
 @RestController
@@ -26,7 +28,7 @@ public class AgeCategoryController {
 	public static final AgeCategory EXAMPLE;
 	static {
 		EXAMPLE=new AgeCategory();
-		EXAMPLE.setName("fill me");
+		EXAMPLE.setName(DEFAULT_EXAMPLE_VALUE);
 	}
 
 	@Autowired

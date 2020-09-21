@@ -14,6 +14,8 @@ import pl.dabrowski.GameShop.assemblers.HardwarePlatformAssembler;
 import pl.dabrowski.GameShop.entities.HardwarePlatform;
 import pl.dabrowski.GameShop.repositories.HardwarePlatformRepository;
 
+import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_VALUE;
+
 import java.util.NoSuchElementException;
 
 @RestController
@@ -26,8 +28,8 @@ public class HardwarePlatformController {
 	public static final HardwarePlatform EXAMPLE;
 	static {
 		EXAMPLE=new HardwarePlatform();
-		EXAMPLE.setName("fill me");
-		EXAMPLE.setShortcut("fill me");
+		EXAMPLE.setName(DEFAULT_EXAMPLE_VALUE);
+		EXAMPLE.setShortcut(DEFAULT_EXAMPLE_VALUE);
 	}
 	
 	@Autowired
