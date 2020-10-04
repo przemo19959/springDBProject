@@ -3,9 +3,11 @@ package pl.dabrowski.GameShop.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,6 +60,11 @@ public class AgeCategoryController {
 			newAgeCategory.setId(id);
 			return ageCategoryAssembler.toModel(ageCategoryRepository.save(newAgeCategory));
 		}));
+	}
+	
+	@PostMapping
+	public ResponseEntity<EntityModel<AgeCategory>> save(@RequestBody AgeCategory newAgeCategory){
+		return new ResponseEntity<>(ageCategoryAssembler.toModel(ageCategoryRepository.save(newAgeCategory)), HttpStatus.CREATED); 
 	}
 	
 	@GetMapping("/example")

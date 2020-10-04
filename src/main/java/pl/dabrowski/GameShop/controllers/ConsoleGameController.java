@@ -9,9 +9,11 @@ import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -84,6 +86,11 @@ public class ConsoleGameController {
 			newConsoleGame.setId(id);
 			return consoleGameAssembler.toModel(consoleGameRepository.save(newConsoleGame));
 		}));
+	}
+	
+	@PostMapping
+	public ResponseEntity<EntityModel<ConsoleGame>> save(@RequestBody ConsoleGame newConsoleGame){
+		return new ResponseEntity<>(consoleGameAssembler.toModel(consoleGameRepository.save(newConsoleGame)), HttpStatus.CREATED); 
 	}
 	
 	@GetMapping("/example")

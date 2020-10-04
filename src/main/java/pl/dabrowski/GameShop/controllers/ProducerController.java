@@ -1,22 +1,25 @@
 package pl.dabrowski.GameShop.controllers;
 
+import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_VALUE;
+
+import java.util.NoSuchElementException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import pl.dabrowski.GameShop.assemblers.ProducerAssembler;
 import pl.dabrowski.GameShop.entities.Producer;
 import pl.dabrowski.GameShop.repositories.ProducerRepository;
-
-import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_VALUE;
-
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping(ProducerController.BASE_URL)
@@ -57,6 +60,11 @@ public class ProducerController {
 			newProducer.setId(id);
 			return producerAssembler.toModel(producerRepository.save(newProducer));
 		}));
+	}
+	
+	@PostMapping
+	public ResponseEntity<EntityModel<Producer>> save(@RequestBody Producer newProducer){
+		return new ResponseEntity<>(producerAssembler.toModel(producerRepository.save(newProducer)), HttpStatus.CREATED); 
 	}
 	
 	@GetMapping("/example")

@@ -3,9 +3,11 @@ package pl.dabrowski.GameShop.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,6 +60,11 @@ public class GameplayModeController {
 			newGameplayMode.setId(id);
 			return gameplayModeAssembler.toModel(gameplayModeRepository.save(newGameplayMode));
 		}));
+	}
+	
+	@PostMapping
+	public ResponseEntity<EntityModel<GameplayMode>> save(@RequestBody GameplayMode newGameplayMode){
+		return new ResponseEntity<>(gameplayModeAssembler.toModel(gameplayModeRepository.save(newGameplayMode)), HttpStatus.CREATED); 
 	}
 	
 	@GetMapping("/example")
