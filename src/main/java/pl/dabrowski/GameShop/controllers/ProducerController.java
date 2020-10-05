@@ -4,6 +4,8 @@ import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_V
 
 import java.util.NoSuchElementException;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -53,7 +55,7 @@ public class ProducerController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<EntityModel<Producer>> update(@RequestBody Producer newProducer, @PathVariable int id) {
+	public ResponseEntity<EntityModel<Producer>> update(@Valid @RequestBody Producer newProducer, @PathVariable int id) {
 		return ResponseEntity.ok(producerRepository.findById(id).map(producer -> {
 			producer.setName(newProducer.getName());
 			return producerAssembler.toModel(producerRepository.save(producer));
@@ -61,7 +63,7 @@ public class ProducerController {
 	}
 
 	@PostMapping
-	public ResponseEntity<EntityModel<Producer>> save(@RequestBody Producer newProducer) {
+	public ResponseEntity<EntityModel<Producer>> save(@Valid @RequestBody Producer newProducer) {
 		return new ResponseEntity<>(producerAssembler.toModel(producerRepository.save(newProducer)),
 				HttpStatus.CREATED);
 	}

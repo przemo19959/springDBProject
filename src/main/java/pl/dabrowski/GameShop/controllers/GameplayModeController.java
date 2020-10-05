@@ -21,6 +21,8 @@ import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_V
 
 import java.util.NoSuchElementException;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(GameplayModeController.BASE_URL)
 public class GameplayModeController {
@@ -52,7 +54,7 @@ public class GameplayModeController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<EntityModel<GameplayMode>> update(@RequestBody GameplayMode newGameplayMode,
+	public ResponseEntity<EntityModel<GameplayMode>> update(@Valid @RequestBody GameplayMode newGameplayMode,
 			@PathVariable int id) {
 		return ResponseEntity.ok(gameplayModeRepository.findById(id).map(gameplayMode -> {
 			gameplayMode.setName(newGameplayMode.getName());
@@ -61,7 +63,7 @@ public class GameplayModeController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<EntityModel<GameplayMode>> save(@RequestBody GameplayMode newGameplayMode){
+	public ResponseEntity<EntityModel<GameplayMode>> save(@Valid @RequestBody GameplayMode newGameplayMode){
 		return new ResponseEntity<>(gameplayModeAssembler.toModel(gameplayModeRepository.save(newGameplayMode)), HttpStatus.CREATED); 
 	}
 	

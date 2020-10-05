@@ -1,6 +1,7 @@
 package pl.dabrowski.GameShop.entities;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,6 +18,7 @@ public class Publisher {
 	
 	@Column(name="nazwa",unique=true)
 	@Size(min = 1,max = 50)
+	@NotNull
 	private String name;
 	
 	@JsonProperty

@@ -4,6 +4,8 @@ import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_V
 
 import java.util.NoSuchElementException;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -53,7 +55,7 @@ public class PublisherController {
 	}
 
 	@PutMapping(value = "{/id}")
-	public ResponseEntity<EntityModel<Publisher>> update(@RequestBody Publisher newPublisher, @PathVariable int id) {
+	public ResponseEntity<EntityModel<Publisher>> update(@Valid @RequestBody Publisher newPublisher, @PathVariable int id) {
 		return ResponseEntity.ok(publisherRepository.findById(id).map(language -> {
 			language.setName(newPublisher.getName());
 			return publisherAssembler.toModel(publisherRepository.save(language));
@@ -61,7 +63,7 @@ public class PublisherController {
 	}
 
 	@PostMapping
-	public ResponseEntity<EntityModel<Publisher>> save(@RequestBody Publisher newPublisher) {
+	public ResponseEntity<EntityModel<Publisher>> save(@Valid @RequestBody Publisher newPublisher) {
 		return new ResponseEntity<>(publisherAssembler.toModel(publisherRepository.save(newPublisher)),
 				HttpStatus.CREATED);
 	}

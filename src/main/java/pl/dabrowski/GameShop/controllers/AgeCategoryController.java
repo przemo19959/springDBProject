@@ -21,6 +21,8 @@ import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_V
 
 import java.util.NoSuchElementException;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(AgeCategoryController.BASE_URL)
 public class AgeCategoryController {
@@ -52,7 +54,7 @@ public class AgeCategoryController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<EntityModel<AgeCategory>> update(@RequestBody AgeCategory newAgeCategory,
+	public ResponseEntity<EntityModel<AgeCategory>> update(@Valid @RequestBody AgeCategory newAgeCategory,
 			@PathVariable int id) {
 		return ResponseEntity.ok(ageCategoryRepository.findById(id).map(ageCategory -> {
 			ageCategory.setName(newAgeCategory.getName());
@@ -61,7 +63,7 @@ public class AgeCategoryController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<EntityModel<AgeCategory>> save(@RequestBody AgeCategory newAgeCategory){
+	public ResponseEntity<EntityModel<AgeCategory>> save(@Valid @RequestBody AgeCategory newAgeCategory){
 		return new ResponseEntity<>(ageCategoryAssembler.toModel(ageCategoryRepository.save(newAgeCategory)), HttpStatus.CREATED); 
 	}
 	

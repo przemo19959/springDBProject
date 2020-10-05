@@ -3,11 +3,13 @@ package pl.dabrowski.GameShop.entities;
 import java.text.MessageFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
+import pl.dabrowski.GameShop.entities.converters.ShortcutConverter;
 
 @Entity
 @Table(name = "platformy_sprzetowe", uniqueConstraints = @UniqueConstraint(name = "UK_name", columnNames = "nazwa"))
@@ -21,10 +23,13 @@ public class HardwarePlatform {
 
 	@Column(name = "nazwa", unique = true)
 	@Size(min = 1, max = 50)
+	@NotNull
 	private String name;
 
 	@Column(name = "skrot")
 	@Size(min = 1, max = 10)
+	@NotNull
+	@Convert(converter = ShortcutConverter.class)
 	private String shortcut;
 
 	@JsonProperty

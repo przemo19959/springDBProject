@@ -4,6 +4,8 @@ import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_V
 
 import java.util.NoSuchElementException;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -54,7 +56,7 @@ public class LanguageController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<EntityModel<Language>> update(@RequestBody Language newLanguage, @PathVariable int id) {
+	public ResponseEntity<EntityModel<Language>> update(@Valid @RequestBody Language newLanguage, @PathVariable int id) {
 		return ResponseEntity.ok(languageRepository.findById(id).map(language -> {
 			language.setName(newLanguage.getName());
 			return languageAssembler.toModel(languageRepository.save(language));
@@ -62,7 +64,7 @@ public class LanguageController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<EntityModel<Language>> save(@RequestBody Language newLanguage){
+	public ResponseEntity<EntityModel<Language>> save(@Valid @RequestBody Language newLanguage){
 		return new ResponseEntity<>(languageAssembler.toModel(languageRepository.save(newLanguage)), HttpStatus.CREATED); 
 	}
 	

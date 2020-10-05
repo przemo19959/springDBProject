@@ -4,6 +4,8 @@ import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_V
 
 import java.util.NoSuchElementException;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -55,7 +57,7 @@ public class HardwarePlatformController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<EntityModel<HardwarePlatform>> update(@RequestBody HardwarePlatform newHardwarePlatform,
+	public ResponseEntity<EntityModel<HardwarePlatform>> update(@Valid @RequestBody HardwarePlatform newHardwarePlatform,
 			@PathVariable int id) {
 		return ResponseEntity.ok(hardwarePlatformRepository.findById(id).map(hardwarePlatform -> {
 			hardwarePlatform.setName(newHardwarePlatform.getName());
@@ -64,7 +66,7 @@ public class HardwarePlatformController {
 	}
 
 	@PostMapping
-	public ResponseEntity<EntityModel<HardwarePlatform>> save(@RequestBody HardwarePlatform newHardwarePlatform) {
+	public ResponseEntity<EntityModel<HardwarePlatform>> save(@Valid @RequestBody HardwarePlatform newHardwarePlatform) {
 		return new ResponseEntity<>(
 				hardwarePlatformAssembler.toModel(hardwarePlatformRepository.save(newHardwarePlatform)),
 				HttpStatus.CREATED);

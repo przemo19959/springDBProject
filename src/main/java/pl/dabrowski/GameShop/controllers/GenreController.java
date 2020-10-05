@@ -21,6 +21,8 @@ import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_V
 
 import java.util.NoSuchElementException;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(GenreController.BASE_URL)
 public class GenreController {
@@ -52,7 +54,7 @@ public class GenreController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<EntityModel<Genre>> update(@RequestBody Genre newGenre, @PathVariable int id) {
+	public ResponseEntity<EntityModel<Genre>> update(@Valid @RequestBody Genre newGenre, @PathVariable int id) {
 		return ResponseEntity.ok(genreRepository.findById(id).map(genre -> {
 			genre.setName(newGenre.getName());
 			return genreAssembler.toModel(genreRepository.save(genre));
@@ -60,7 +62,7 @@ public class GenreController {
 	}
 
 	@PostMapping
-	public ResponseEntity<EntityModel<Genre>> save(@RequestBody Genre newGenre) {
+	public ResponseEntity<EntityModel<Genre>> save(@Valid @RequestBody Genre newGenre) {
 		return new ResponseEntity<>(genreAssembler.toModel(genreRepository.save(newGenre)), HttpStatus.CREATED);
 	}
 

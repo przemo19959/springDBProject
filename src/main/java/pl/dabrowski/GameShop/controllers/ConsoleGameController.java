@@ -5,6 +5,8 @@ import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_V
 import java.time.LocalDate;
 import java.util.NoSuchElementException;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -62,7 +64,7 @@ public class ConsoleGameController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<EntityModel<ConsoleGame>> update(@RequestBody ConsoleGame newConsoleGame,
+	public ResponseEntity<EntityModel<ConsoleGame>> update(@Valid @RequestBody ConsoleGame newConsoleGame,
 			@PathVariable int id) {
 		return ResponseEntity.ok(consoleGameRepository.findById(id).map(consoleGame -> {
 			consoleGame.setTitle(newConsoleGame.getTitle());
@@ -79,7 +81,7 @@ public class ConsoleGameController {
 	}
 
 	@PostMapping
-	public ResponseEntity<EntityModel<ConsoleGame>> save(@RequestBody ConsoleGame newConsoleGame) {
+	public ResponseEntity<EntityModel<ConsoleGame>> save(@Valid @RequestBody ConsoleGame newConsoleGame) {
 		return new ResponseEntity<>(consoleGameAssembler.toModel(consoleGameRepository.save(newConsoleGame)),
 				HttpStatus.CREATED);
 	}
