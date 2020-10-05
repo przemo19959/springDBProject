@@ -6,7 +6,8 @@ import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
-import java.util.Date;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "gry_konsolowe", uniqueConstraints = @UniqueConstraint(name = "UK_title", columnNames = "tytul"))
@@ -20,10 +21,9 @@ public class ConsoleGame {
     @Size(min = 1, max = 200)
     private String title;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "data_wydania")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date dateOfRelease;
+    private LocalDate dateOfRelease;
 
     @OneToOne
     @JoinColumn(name = "fk_wydawca", foreignKey = @ForeignKey(name = "FK_publisher"))

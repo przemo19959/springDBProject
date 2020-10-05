@@ -2,9 +2,7 @@ package pl.dabrowski.GameShop.controllers;
 
 import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_VALUE;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
+import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
@@ -31,17 +29,11 @@ public class ConsoleGameController {
 	private final ConsoleGameRepository consoleGameRepository;
 	private final ConsoleGameAssembler consoleGameAssembler;
 	private static final ConsoleGame EXAMPLE;
-	
+
 	static {
-		EXAMPLE=new ConsoleGame();
+		EXAMPLE = new ConsoleGame();
 		EXAMPLE.setTitle(DEFAULT_EXAMPLE_VALUE);
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-		String dateInString = "2000-01-01";
-		try {
-			EXAMPLE.setDateOfRelease(formatter.parse(dateInString));
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+		EXAMPLE.setDateOfRelease(LocalDate.parse("2000-01-01"));
 		EXAMPLE.setAgeCategory(AgeCategoryController.EXAMPLE);
 		EXAMPLE.setGameplayMode(GameplayModeController.EXAMPLE);
 		EXAMPLE.setGenre(GenreController.EXAMPLE);
@@ -81,20 +73,22 @@ public class ConsoleGameController {
 			consoleGame.setProducer(newConsoleGame.getProducer());
 			consoleGame.setPublisher(newConsoleGame.getPublisher());
 			consoleGame.setLanguage(newConsoleGame.getLanguage());
+			System.out.println(consoleGame);
 			return consoleGameAssembler.toModel(consoleGameRepository.save(consoleGame));
 		}).orElseGet(() -> {
 			newConsoleGame.setId(id);
 			return consoleGameAssembler.toModel(consoleGameRepository.save(newConsoleGame));
 		}));
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<EntityModel<ConsoleGame>> save(@RequestBody ConsoleGame newConsoleGame){
-		return new ResponseEntity<>(consoleGameAssembler.toModel(consoleGameRepository.save(newConsoleGame)), HttpStatus.CREATED); 
+	public ResponseEntity<EntityModel<ConsoleGame>> save(@RequestBody ConsoleGame newConsoleGame) {
+		return new ResponseEntity<>(consoleGameAssembler.toModel(consoleGameRepository.save(newConsoleGame)),
+				HttpStatus.CREATED);
 	}
-	
+
 	@GetMapping("/example")
-	public ResponseEntity<EntityModel<ConsoleGame>> example(){
+	public ResponseEntity<EntityModel<ConsoleGame>> example() {
 		return ResponseEntity.ok(consoleGameAssembler.toModel(EXAMPLE));
 	}
 }

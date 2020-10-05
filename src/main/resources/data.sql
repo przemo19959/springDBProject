@@ -17,7 +17,7 @@ values (1, 'od lat 7'),
 insert into platformy_sprzetowe (id, nazwa, skrot)
 VALUES (1, 'Playstation 3', 'PS3'),
        (2, 'Xbox 360', 'X360');
-
+	   
 INSERT INTO producenci (id, nazwa)
 VALUES (1, 'Ubisoft'),
        (2, 'Santa Monica Studio');
