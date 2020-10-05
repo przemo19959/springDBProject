@@ -9,6 +9,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,15 +58,18 @@ public class LanguageController {
 		return ResponseEntity.ok(languageRepository.findById(id).map(language -> {
 			language.setName(newLanguage.getName());
 			return languageAssembler.toModel(languageRepository.save(language));
-		}).orElseGet(() -> {
-			newLanguage.setId(id);
-			return languageAssembler.toModel(languageRepository.save(newLanguage));
-		}));
+		}).orElseThrow(NoSuchElementException::new));
 	}
 	
 	@PostMapping
 	public ResponseEntity<EntityModel<Language>> save(@RequestBody Language newLanguage){
 		return new ResponseEntity<>(languageAssembler.toModel(languageRepository.save(newLanguage)), HttpStatus.CREATED); 
+	}
+	
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> delete(@PathVariable int id) {
+		languageRepository.delete(languageRepository.findById(id).orElseThrow(NoSuchElementException::new));
+		return ResponseEntity.ok().build();
 	}
 	
 	@GetMapping("/example")

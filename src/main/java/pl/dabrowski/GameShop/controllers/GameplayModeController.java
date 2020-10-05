@@ -5,6 +5,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,15 +57,18 @@ public class GameplayModeController {
 		return ResponseEntity.ok(gameplayModeRepository.findById(id).map(gameplayMode -> {
 			gameplayMode.setName(newGameplayMode.getName());
 			return gameplayModeAssembler.toModel(gameplayModeRepository.save(gameplayMode));
-		}).orElseGet(() -> {
-			newGameplayMode.setId(id);
-			return gameplayModeAssembler.toModel(gameplayModeRepository.save(newGameplayMode));
-		}));
+		}).orElseThrow(NoSuchElementException::new));
 	}
 	
 	@PostMapping
 	public ResponseEntity<EntityModel<GameplayMode>> save(@RequestBody GameplayMode newGameplayMode){
 		return new ResponseEntity<>(gameplayModeAssembler.toModel(gameplayModeRepository.save(newGameplayMode)), HttpStatus.CREATED); 
+	}
+	
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> delete(@PathVariable int id) {
+		gameplayModeRepository.delete(gameplayModeRepository.findById(id).orElseThrow(NoSuchElementException::new));
+		return ResponseEntity.ok().build();
 	}
 	
 	@GetMapping("/example")

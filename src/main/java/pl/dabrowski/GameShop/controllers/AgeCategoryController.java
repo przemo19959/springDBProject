@@ -5,6 +5,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,15 +57,18 @@ public class AgeCategoryController {
 		return ResponseEntity.ok(ageCategoryRepository.findById(id).map(ageCategory -> {
 			ageCategory.setName(newAgeCategory.getName());
 			return ageCategoryAssembler.toModel(ageCategoryRepository.save(ageCategory));
-		}).orElseGet(() -> {
-			newAgeCategory.setId(id);
-			return ageCategoryAssembler.toModel(ageCategoryRepository.save(newAgeCategory));
-		}));
+		}).orElseThrow(NoSuchElementException::new));
 	}
 	
 	@PostMapping
 	public ResponseEntity<EntityModel<AgeCategory>> save(@RequestBody AgeCategory newAgeCategory){
 		return new ResponseEntity<>(ageCategoryAssembler.toModel(ageCategoryRepository.save(newAgeCategory)), HttpStatus.CREATED); 
+	}
+	
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> delete(@PathVariable int id) {
+		ageCategoryRepository.delete(ageCategoryRepository.findById(id).orElseThrow(NoSuchElementException::new));
+		return ResponseEntity.ok().build();
 	}
 	
 	@GetMapping("/example")

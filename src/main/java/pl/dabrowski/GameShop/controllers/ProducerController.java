@@ -9,6 +9,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,10 +28,10 @@ public class ProducerController {
 	final static String BASE_URL = "/producers";
 	private final ProducerRepository producerRepository;
 	private final ProducerAssembler producerAssembler;
-	
+
 	public static final Producer EXAMPLE;
 	static {
-		EXAMPLE=new Producer();
+		EXAMPLE = new Producer();
 		EXAMPLE.setName(DEFAULT_EXAMPLE_VALUE);
 	}
 
@@ -50,25 +51,29 @@ public class ProducerController {
 		return ResponseEntity.ok(producerAssembler.toModel(producerRepository.findById(id)//
 				.orElseThrow(NoSuchElementException::new)));
 	}
-	
+
 	@PutMapping("/{id}")
 	public ResponseEntity<EntityModel<Producer>> update(@RequestBody Producer newProducer, @PathVariable int id) {
 		return ResponseEntity.ok(producerRepository.findById(id).map(producer -> {
 			producer.setName(newProducer.getName());
 			return producerAssembler.toModel(producerRepository.save(producer));
-		}).orElseGet(() -> {
-			newProducer.setId(id);
-			return producerAssembler.toModel(producerRepository.save(newProducer));
-		}));
+		}).orElseThrow(NoSuchElementException::new));
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<EntityModel<Producer>> save(@RequestBody Producer newProducer){
-		return new ResponseEntity<>(producerAssembler.toModel(producerRepository.save(newProducer)), HttpStatus.CREATED); 
+	public ResponseEntity<EntityModel<Producer>> save(@RequestBody Producer newProducer) {
+		return new ResponseEntity<>(producerAssembler.toModel(producerRepository.save(newProducer)),
+				HttpStatus.CREATED);
 	}
-	
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> delete(@PathVariable int id) {
+		producerRepository.delete(producerRepository.findById(id).orElseThrow(NoSuchElementException::new));
+		return ResponseEntity.ok().build();
+	}
+
 	@GetMapping("/example")
-	public ResponseEntity<EntityModel<Producer>> example(){
+	public ResponseEntity<EntityModel<Producer>> example() {
 		return ResponseEntity.ok(producerAssembler.toModel(EXAMPLE));
 	}
 }

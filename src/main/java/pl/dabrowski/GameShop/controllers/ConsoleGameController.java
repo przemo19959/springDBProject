@@ -3,12 +3,14 @@ package pl.dabrowski.GameShop.controllers;
 import static pl.dabrowski.GameShop.controllers.RootController.DEFAULT_EXAMPLE_VALUE;
 
 import java.time.LocalDate;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -62,7 +64,6 @@ public class ConsoleGameController {
 	@PutMapping("/{id}")
 	public ResponseEntity<EntityModel<ConsoleGame>> update(@RequestBody ConsoleGame newConsoleGame,
 			@PathVariable int id) {
-		System.out.println(newConsoleGame);
 		return ResponseEntity.ok(consoleGameRepository.findById(id).map(consoleGame -> {
 			consoleGame.setTitle(newConsoleGame.getTitle());
 			consoleGame.setDateOfRelease(newConsoleGame.getDateOfRelease());
@@ -73,18 +74,20 @@ public class ConsoleGameController {
 			consoleGame.setProducer(newConsoleGame.getProducer());
 			consoleGame.setPublisher(newConsoleGame.getPublisher());
 			consoleGame.setLanguage(newConsoleGame.getLanguage());
-			System.out.println(consoleGame);
 			return consoleGameAssembler.toModel(consoleGameRepository.save(consoleGame));
-		}).orElseGet(() -> {
-			newConsoleGame.setId(id);
-			return consoleGameAssembler.toModel(consoleGameRepository.save(newConsoleGame));
-		}));
+		}).orElseThrow(NoSuchElementException::new));
 	}
 
 	@PostMapping
 	public ResponseEntity<EntityModel<ConsoleGame>> save(@RequestBody ConsoleGame newConsoleGame) {
 		return new ResponseEntity<>(consoleGameAssembler.toModel(consoleGameRepository.save(newConsoleGame)),
 				HttpStatus.CREATED);
+	}
+	
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> delete(@PathVariable int id) {
+		consoleGameRepository.delete(consoleGameRepository.findById(id).orElseThrow(NoSuchElementException::new));
+		return ResponseEntity.ok().build();
 	}
 
 	@GetMapping("/example")

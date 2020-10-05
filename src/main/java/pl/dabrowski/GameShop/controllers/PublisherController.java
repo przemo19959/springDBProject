@@ -9,6 +9,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,10 +28,10 @@ public class PublisherController {
 	final static String BASE_URL = "/publishers";
 	private final PublisherRepository publisherRepository;
 	private final PublisherAssembler publisherAssembler;
-	
+
 	public static final Publisher EXAMPLE;
 	static {
-		EXAMPLE=new Publisher();
+		EXAMPLE = new Publisher();
 		EXAMPLE.setName(DEFAULT_EXAMPLE_VALUE);
 	}
 
@@ -56,19 +57,23 @@ public class PublisherController {
 		return ResponseEntity.ok(publisherRepository.findById(id).map(language -> {
 			language.setName(newPublisher.getName());
 			return publisherAssembler.toModel(publisherRepository.save(language));
-		}).orElseGet(() -> {
-			newPublisher.setId(id);
-			return publisherAssembler.toModel(publisherRepository.save(newPublisher));
-		}));
+		}).orElseThrow(NoSuchElementException::new));
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<EntityModel<Publisher>> save(@RequestBody Publisher newPublisher){
-		return new ResponseEntity<>(publisherAssembler.toModel(publisherRepository.save(newPublisher)), HttpStatus.CREATED); 
+	public ResponseEntity<EntityModel<Publisher>> save(@RequestBody Publisher newPublisher) {
+		return new ResponseEntity<>(publisherAssembler.toModel(publisherRepository.save(newPublisher)),
+				HttpStatus.CREATED);
 	}
-	
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> delete(@PathVariable int id) {
+		publisherRepository.delete(publisherRepository.findById(id).orElseThrow(NoSuchElementException::new));
+		return ResponseEntity.ok().build();
+	}
+
 	@GetMapping("/example")
-	public ResponseEntity<EntityModel<Publisher>> example(){
+	public ResponseEntity<EntityModel<Publisher>> example() {
 		return ResponseEntity.ok(publisherAssembler.toModel(EXAMPLE));
 	}
 }

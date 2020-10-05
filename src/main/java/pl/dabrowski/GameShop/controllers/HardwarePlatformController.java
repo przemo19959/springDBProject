@@ -9,6 +9,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,14 +28,14 @@ public class HardwarePlatformController {
 	final static String BASE_URL = "/hardwarePlatforms";
 	private final HardwarePlatformRepository hardwarePlatformRepository;
 	private final HardwarePlatformAssembler hardwarePlatformAssembler;
-	
+
 	public static final HardwarePlatform EXAMPLE;
 	static {
-		EXAMPLE=new HardwarePlatform();
+		EXAMPLE = new HardwarePlatform();
 		EXAMPLE.setName(DEFAULT_EXAMPLE_VALUE);
 		EXAMPLE.setShortcut(DEFAULT_EXAMPLE_VALUE);
 	}
-	
+
 	@Autowired
 	public HardwarePlatformController(HardwarePlatformRepository hardwarePlatformRepository,
 			HardwarePlatformAssembler hardwarePlatformAssembler) {
@@ -52,25 +53,32 @@ public class HardwarePlatformController {
 		return ResponseEntity.ok(hardwarePlatformAssembler.toModel(hardwarePlatformRepository.findById(id)//
 				.orElseThrow(NoSuchElementException::new)));
 	}
-	
+
 	@PutMapping("/{id}")
-	public ResponseEntity<EntityModel<HardwarePlatform>> update(@RequestBody HardwarePlatform newHardwarePlatform, @PathVariable int id) {
+	public ResponseEntity<EntityModel<HardwarePlatform>> update(@RequestBody HardwarePlatform newHardwarePlatform,
+			@PathVariable int id) {
 		return ResponseEntity.ok(hardwarePlatformRepository.findById(id).map(hardwarePlatform -> {
 			hardwarePlatform.setName(newHardwarePlatform.getName());
 			return hardwarePlatformAssembler.toModel(hardwarePlatformRepository.save(hardwarePlatform));
-		}).orElseGet(() -> {
-			newHardwarePlatform.setId(id);
-			return hardwarePlatformAssembler.toModel(hardwarePlatformRepository.save(newHardwarePlatform));
-		}));
+		}).orElseThrow(NoSuchElementException::new));
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<EntityModel<HardwarePlatform>> save(@RequestBody HardwarePlatform newHardwarePlatform){
-		return new ResponseEntity<>(hardwarePlatformAssembler.toModel(hardwarePlatformRepository.save(newHardwarePlatform)), HttpStatus.CREATED); 
+	public ResponseEntity<EntityModel<HardwarePlatform>> save(@RequestBody HardwarePlatform newHardwarePlatform) {
+		return new ResponseEntity<>(
+				hardwarePlatformAssembler.toModel(hardwarePlatformRepository.save(newHardwarePlatform)),
+				HttpStatus.CREATED);
 	}
-	
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> delete(@PathVariable int id) {
+		hardwarePlatformRepository
+				.delete(hardwarePlatformRepository.findById(id).orElseThrow(NoSuchElementException::new));
+		return ResponseEntity.ok().build();
+	}
+
 	@GetMapping("/example")
-	public ResponseEntity<EntityModel<HardwarePlatform>> example(){
+	public ResponseEntity<EntityModel<HardwarePlatform>> example() {
 		return ResponseEntity.ok(hardwarePlatformAssembler.toModel(EXAMPLE));
 	}
 }
